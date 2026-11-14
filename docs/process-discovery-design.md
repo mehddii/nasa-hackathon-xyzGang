@@ -24,6 +24,19 @@ Clustering discovers recurring property combinations. It does not prove their ca
 - Literature-backed evidence recipes.
 - Known positive and negative control locations.
 
+## Mars broad-discovery implementation
+
+`03_mars_region_discovery.ipynb` implements the broad global stage as follows:
+
+1. Analyse each physical scale and compatible coverage cohort separately.
+2. Quantize complete science-feature groups into small property prototypes, then split those prototypes into four-neighbor connected components with longitude wrapping.
+3. Summarize every connected region in physical units, model space, quality context, area, perimeter, internal variation, adjacency, and parent/child scale links.
+4. Compare K-means, diagonal Gaussian mixtures, and HDBSCAN using geographic-fold stability, silhouette separation, and assigned coverage.
+5. Run Isolation Forest anomaly screening, coverage-only cluster prediction, and science-family ablations.
+6. Preserve neutral type identifiers before applying four conservative screening recipes: mafic igneous material, water/hydrothermal alteration, dust or loose material, and hydrogen-enriched subsurface environments.
+
+The screening recipes explicitly retain missing confirmation evidence and alternative explanations. They do not establish current activity, and they do not replace targeted CTX/HiRISE, CRISM, THEMIS, SHARAD, or repeat-observation refinement.
+
 ## Step 1 — Multiscale homogeneous regions
 
 A homogeneous region is a connected area whose selected properties vary within stated tolerances at a stated spatial scale.
