@@ -76,7 +76,7 @@ High-resolution targeted data must not be used to estimate how common a process 
 |---|---|---|
 | Elevation | MOLA Mission Experiment Gridded Data Record (MEGDR), preferably the maintained PDS4 topography-derived bundle | Elevation, slope, curvature, relief, basins, and drainage context |
 | Thermal behavior | MGS TES derived thermal-inertia maps; THEMIS global products may supplement where their product definition is appropriate | Particle-size/rockiness proxy and thermal surface behavior |
-| Surface composition | CRISM multispectral map or MRDR products with documented correction and quality masks | Broad mineral and hydration indicators |
+| Surface composition | Global MGS TES mineral and surface-emissivity products at their published 1° support | Broad composition and spectral-shape indicators; CRISM is reserved for candidate refinement |
 | Hydrogen | Mars Odyssey GRS/HEND/Neutron Spectrometer derived maps | Coarse near-surface hydrogen evidence |
 | Base morphology | A documented global controlled mosaic suitable for regional texture at its native effective resolution | Broad morphology and context only |
 
@@ -105,8 +105,9 @@ These products are searched geographically through Mars ODE or their mission arc
 - Thermal variables.
 - Mineral/composition variables.
 - Hydrogen variables at their true effective footprint.
-- Base-image texture features.
+- Contrast-normalized TES spectral-shape components and separate spectral contrast.
 - Per-property missing flags.
+- Coverage cohort for missing-aware analysis.
 - Per-property source resolution.
 - Product identifiers and versions.
 
@@ -183,13 +184,13 @@ Every exported column has an explicit role in `feature_schema.csv`:
 - `quality_context`: coverage, fit error, and confidence information used to test clusters for artifacts, never to define the default clusters.
 - `geographic_context`: coordinates, spatial folds, and resolution metadata used for spatial validation, never to define the default clusters.
 
-The model-ready columns use the prefix `model__`. After robust scaling, each science family is weighted by `1 / sqrt(number of active features in that family)`. This prevents a family such as composition from dominating only because it has more columns than terrain or reflectance.
+The model-ready columns use the prefix `model__`. After robust scaling, ordinary science families are weighted by `1 / sqrt(number of active features in that family)`. PCA scores instead share one group-energy denominator, which preserves the explained-variance ordering of the components while balancing the spectral group against other families. This prevents both wide feature families and low-variance PCA noise from dominating.
 
 ### Spectral compression
 
-Use PCA first for high-dimensional spectra because its components and explained variance can be inspected. For Mars TES emissivity, preserve overall level separately, calculate spectral contrast, mean-centre each spectrum, and fit PCA to spectral shape only. This avoids duplicating albedo through a dominant brightness component. Select the component count from training explained variance, verify reconstruction on held-out geographic blocks, and preserve the original source cube outside the clustering table.
+Use PCA first for high-dimensional spectra because its components and explained variance can be inspected. For Mars TES emissivity, preserve overall level and contrast separately, then mean-centre and contrast-normalize each reliable spectrum before fitting PCA. Preserve a 99%-variance archive representation, but expose only the leading components reaching 95% as default clustering inputs. Verify reconstruction on held-out geographic blocks and preserve the original source cube outside the clustering table.
 
-TES mineral-abundance maps remain available in raw form for interpretation. The default clustering columns are separate quality-masked copies. Their mask uses valid-band coverage and a mineral-fit RMS threshold fitted only on training geography, so a weak fit becomes missing data rather than a false zero abundance.
+TES mineral-abundance maps remain available in raw form for interpretation. Aggregate their 2-pixel/degree delivery grids to the 1° support used by the published analysis without filling gaps between orbital tracks. Quality requires the published RMS fit limit (<0.005), valid-band coverage, and sufficient source-pixel support. Default mineral inputs retain only concentrations at or above the conservative published 0.10 detection limit. Sub-threshold continuous values remain optional follow-up evidence rather than confirmed mineral detections. The fitted surface-dust component remains a separate feature because the mineral detection limit does not apply to it.
 
 An autoencoder is considered only if PCA reconstruction removes important spectral structure. It must be compared with PCA using held-out reconstruction, stability of downstream clusters, and interpretability. An autoencoder is not automatically preferred because GPUs are available.
 
@@ -262,11 +263,11 @@ Every prepared layer must have a manifest entry containing:
 3. Preserve source files, labels, checksums, and provenance.
 4. Read documented measurements and apply quality/fill-value masks.
 5. Correct documented acquisition effects and retain acquisition metadata.
-6. Build separate coarse and medium Mars grids; reserve fine products for regional refinement.
+6. Build separate 1° medium and 10° coarse Mars grids; reserve fine products for regional refinement.
 7. Reproject and aggregate without exceeding effective source resolution.
 8. Calculate neutral terrain, thermal, statistical, and texture features.
 9. Separate science, optional, quality, and geographic fields; robust-scale default science features on training geography and balance feature families.
-10. Separate TES emissivity level from spectral shape, fit PCA to shape, and create quality-masked mineral copies.
+10. Separate TES emissivity level and contrast from contrast-normalized shape; preserve a 99% PCA archive view and a leading 95% model view; create detection-aware mineral copies.
 11. Export rasters, masks, feature schema, fitted transforms, provenance, and `mars_cells_input.parquet`.
 12. Show coverage, quality, redundancy, and spectral-compression diagnostics.
 

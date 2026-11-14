@@ -52,7 +52,7 @@ After segmentation, aggregate cell-level inputs into a region representation con
 
 ## Step 2 — Neutral region types
 
-Cluster region summaries separately for each planet and scale.
+Cluster region summaries separately for each planet, scale, and compatible `analysis_cohort`. A model may combine cohorts only if it explicitly handles missing feature families and is tested against a cohort-only baseline; ordinary median filling across absent instrument coverage is not acceptable.
 
 Compare several clustering behaviors rather than trusting one algorithm:
 
