@@ -24,6 +24,17 @@ Preparation means:
 
 It does not mean independently proving that NASA calibrated its instruments correctly.
 
+## Four-notebook contract
+
+| Notebook | Owns | Does not own |
+|---|---|---|
+| `01_mars_data_preparation.ipynb` | Mars download, cleaning, multiscale grids, normalization, neutral features, PCA/embeddings, cell-level export | Regions, clustering, anomalies, process labels |
+| `02_moon_data_preparation.ipynb` | Moon download, cleaning, multiscale grids, normalization, neutral features, PCA/embeddings, cell-level export | Regions, clustering, anomalies, process labels |
+| `03_mars_region_discovery.ipynb` | Connected Mars regions, region summaries, clustering, anomaly detection, artifact tests, scientific interpretation | Source-data calibration |
+| `04_moon_region_discovery.ipynb` | Connected Moon regions, region summaries, clustering, anomaly detection, artifact tests, scientific interpretation | Source-data calibration |
+
+The preparation notebooks export temporary geographic cells. A cell is only a numerical support area. It is not yet a homogeneous scientific region.
+
 ## Access strategy
 
 Use each service for the job it performs well:
@@ -86,7 +97,7 @@ These products are searched geographically through Mars ODE or their mission arc
 
 ### Mars output
 
-`mars_regions_input.parquet` contains one row per temporary analysis cell:
+`mars_cells_input.parquet` contains one row per temporary analysis cell and scale:
 
 - Cell identifier and geometry.
 - Elevation.
@@ -129,7 +140,7 @@ These products are searched geographically through Lunar ODE, the Planetary Imag
 
 ### Moon output
 
-`moon_regions_input.parquet` contains:
+`moon_cells_input.parquet` contains one row per temporary analysis cell and scale:
 
 - Cell identifier and geometry.
 - Elevation.
@@ -140,6 +151,50 @@ These products are searched geographically through Lunar ODE, the Planetary Imag
 - Mini-RF variables where coverage exists.
 - Illumination/shadow variables where calculated.
 - Missing flags, source resolution, acquisition context, and provenance.
+
+## Neutral clustering representations
+
+Preparation preserves the original downloaded products and creates cluster-friendly representations without encoding process labels such as volcano, river, or ice.
+
+### Direct physical variables
+
+Keep understandable measurements in their documented units, including elevation, temperature, reflectance, hydrogen-sensitive measurements, radar values, and validated mineral indicators.
+
+### Neutral derived variables
+
+Calculate general properties useful across many possible processes:
+
+- Slope, curvature, relief, and roughness from elevation.
+- Mean, spread, range, and gradients of physical measurements.
+- Temperature variation when observations support it.
+- Image texture, edge density, and directional texture.
+- Observation count, missingness, source resolution, and uncertainty.
+
+These describe the surface without assigning a process.
+
+### Numeric scaling
+
+Store unscaled values and a separate model-ready version. Fit scaling parameters on the training geography only. Candidate methods are robust scaling for variables with outliers and standard scaling for approximately symmetric variables. Scaling parameters are saved and reused; they are not recomputed on evaluation regions.
+
+### Spectral compression
+
+Use PCA first for high-dimensional mineral spectra because its components and explained variance can be inspected. Select the component count from reconstruction/explained-variance results rather than a fixed guess. Preserve the original quality-masked spectra outside the clustering table.
+
+An autoencoder is considered only if PCA reconstruction removes important spectral structure. It must be compared with PCA using held-out reconstruction, stability of downstream clusters, and interpretability. An autoencoder is not automatically preferred because GPUs are available.
+
+### Image representation
+
+Do not place every raw image pixel into the clustering table. Create patch-level texture summaries and image embeddings using a documented encoder. Store patch location, ground resolution, illumination/acquisition metadata, and the encoder version. Compare embeddings with simpler texture features so an opaque representation is retained only when it provides stable additional information.
+
+### Multiple resolutions
+
+Create separate coarse, medium, and fine feature views. Do not copy a coarse hydrogen or neutron value into thousands of fine image cells and count those cells as independent measurements.
+
+- Coarse view: broad regional measurements such as hydrogen-sensitive maps and global context.
+- Medium view: terrain, thermal behavior, composition, and global imagery.
+- Fine view: targeted detailed imagery and local products used later for refinement.
+
+Each row records the source footprint or parent coarse cell. Cross-scale evidence is combined during region interpretation, not by pretending all measurements have the same resolution.
 
 ## Grid and resolution rules
 
@@ -193,21 +248,29 @@ Every prepared layer must have a manifest entry containing:
 
 1. Resolve the curated Mars manifest through PDS.
 2. Download global core layers under explicit limits.
-3. Read and mask products.
-4. Reproject and aggregate them.
-5. Calculate Mars terrain and texture features.
-6. Export Mars rasters, masks, provenance, and `mars_regions_input.parquet`.
-7. Show coverage and missingness maps.
+3. Preserve source files, labels, checksums, and provenance.
+4. Read documented measurements and apply quality/fill-value masks.
+5. Correct documented acquisition effects and retain acquisition metadata.
+6. Build separate coarse and medium Mars grids; reserve fine products for regional refinement.
+7. Reproject and aggregate without exceeding effective source resolution.
+8. Calculate neutral terrain, thermal, statistical, and texture features.
+9. Normalize numeric features and fit PCA for spectra; benchmark image embeddings against simple texture features.
+10. Export rasters, masks, fitted transforms, provenance, and `mars_cells_input.parquet`.
+11. Show coverage, missingness, resolution, and value-distribution diagnostics.
 
 ### `02_moon_data_preparation.ipynb`
 
 1. Resolve the curated Moon manifest.
 2. Download global core layers.
-3. Read and mask products.
-4. Build global and polar grids.
-5. Calculate terrain, thermal, illumination, and texture features.
-6. Export Moon rasters, masks, provenance, and `moon_regions_input.parquet`.
-7. Show coverage and missingness maps.
+3. Preserve source files, labels, checksums, and provenance.
+4. Read documented measurements and apply quality/fill-value masks.
+5. Correct documented acquisition effects and retain acquisition metadata.
+6. Build separate global, polar, coarse, and medium views; reserve fine products for regional refinement.
+7. Reproject and aggregate without exceeding effective source resolution.
+8. Calculate neutral terrain, thermal, illumination, statistical, and texture features.
+9. Normalize numeric features and fit PCA/embeddings where dimensionality requires them.
+10. Export rasters, masks, fitted transforms, provenance, and `moon_cells_input.parquet`.
+11. Show coverage, missingness, resolution, and value-distribution diagnostics.
 
 ### Regional download modules
 
@@ -215,9 +278,8 @@ Regional high-resolution retrieval should be reusable Python code called by late
 
 ## Completion criteria
 
-Mars preparation is complete when its core global layers align, retain provenance and uncertainty, and produce a usable feature table without false high-resolution fusion.
+Mars preparation is complete when its core global layers align, retain provenance and uncertainty, and produce a usable cell-level feature table without false high-resolution fusion. Direct values, compressed values, scale identifiers, acquisition context, and missingness must remain distinguishable.
 
-Moon preparation is complete when its global and polar layers align, retain provenance and uncertainty, and produce a usable feature table without treating supporting hydrogen/radar signals as proof of ice.
+Moon preparation is complete when its global and polar layers align, retain provenance and uncertainty, and produce a usable cell-level feature table without treating supporting hydrogen/radar signals as proof of ice. Direct values, compressed values, scale identifiers, acquisition context, and missingness must remain distinguishable.
 
 Process discovery begins only from these prepared outputs. There is no separate feasibility verdict stage.
-

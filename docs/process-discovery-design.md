@@ -18,8 +18,8 @@ Clustering discovers recurring property combinations. It does not prove their ca
 
 ## Inputs
 
-- `mars_regions_input.parquet` and aligned Mars rasters/masks.
-- `moon_regions_input.parquet` and aligned Moon rasters/masks.
+- `mars_cells_input.parquet` and aligned Mars rasters/masks.
+- `moon_cells_input.parquet` and aligned Moon rasters/masks.
 - Provenance manifests.
 - Literature-backed evidence recipes.
 - Known positive and negative control locations.
@@ -39,9 +39,29 @@ There is no universal smallest region. A region can be thermally uniform but con
 
 Each region stores its boundary, area, scale, property distributions, internal variation, missingness, uncertainty, neighbors, and parent/child relationships.
 
+Candidate segmentation methods include watershed segmentation for strong raster boundaries, superpixels for image/feature patches, and a region-adjacency graph for merging neighboring segments. Methods are compared using internal homogeneity, boundary reproducibility, and stability across legitimate scales. The chosen method must enforce spatial connectivity.
+
+After segmentation, aggregate cell-level inputs into a region representation containing:
+
+- Robust summaries of direct physical variables.
+- Distributions and internal variation, not only averages.
+- Aggregated spectral PCA and image/texture representations.
+- Region size, shape, and boundary strength.
+- Neighboring-region context.
+- Scale, source footprint, missingness, resolution, acquisition context, and uncertainty.
+
 ## Step 2 — Neutral region types
 
 Cluster region summaries separately for each planet and scale.
+
+Compare several clustering behaviors rather than trusting one algorithm:
+
+- HDBSCAN for irregular clusters, variable density, and explicit noise points.
+- Gaussian mixture models for soft membership and overlapping region types when their assumptions are reasonable.
+- Graph/community clustering when neighborhood relationships are central.
+- A simple K-means baseline to expose whether complexity is actually useful.
+
+PCA supports compression; UMAP may support visualization but is not treated as proof of real cluster separation. Model selection uses geographic stability, resampling stability, interpretability, and control-site behavior rather than a single silhouette score.
 
 Initial labels remain neutral, such as `mars_region_type_07`. Before scientific interpretation:
 
@@ -51,6 +71,12 @@ Initial labels remain neutral, such as `mars_region_type_07`. Before scientific 
 - Check whether clusters are explained by latitude, illumination, instrument coverage, missing data, or resolution.
 - Use spatial holdouts rather than random neighboring-cell splits.
 - Run anomaly detection so rare but important regions are not discarded.
+
+Use Isolation Forest and/or representation reconstruction error as anomaly candidates. An anomaly is an unusual region, not automatically a rare process. It receives the same scientific review as a normal cluster.
+
+### Acquisition-artifact test
+
+Train a diagnostic model to predict cluster identity using only instrument, observation date, illumination/observation geometry, source resolution, and missingness. If those metadata strongly predict clusters, acquisition conditions may dominate the scientific measurements. The response is to correct the representation or split incompatible observation groups, not to interpret those clusters geologically.
 
 ## Step 3 — Evidence recipes
 
@@ -179,6 +205,8 @@ For each neutral region type:
 
 Every interpreted region has separate fields for interpretation, activity status, evidence confidence, data confidence, alternative explanations, and Earth transferability.
 
+Evidence recipes are defined before final labels are assigned, even though they are applied after neutral clustering. This prevents post-hoc selection of whichever paper makes a cluster appear convincing.
+
 ## Step 5 — Regional refinement
 
 After broad discovery, request high-resolution observations intersecting the candidate region:
@@ -250,4 +278,3 @@ The process-discovery stage passes when:
 6. Positive controls are recovered and negative controls constrain false positives.
 7. Ambiguous regions remain unresolved.
 8. Earth translations use variables that can actually be measured globally or regionally.
-
