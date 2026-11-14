@@ -1,10 +1,14 @@
 # Notebooks
 
-Run notebooks in numerical order.
+The previous feasibility notebook was removed. It added a separate decision stage where normal data-loading checks were enough and could incorrectly interpret PDS Search indexing gaps as unavailable scientific data.
 
-| Notebook | Purpose |
-|---|---|
-| `01_pds_data_feasibility.ipynb` | Inventory and validate Moon/Mars PDS measurements, coverage, resolution, formats, overlap, and compute cost before process discovery |
+The implementation order is now:
 
-The previous metadata-keyword ranking experiment was removed because keyword frequency cannot validate a planetary process or an Earth filter.
+| Order | Notebook | Purpose |
+|---|---|---|
+| 1 | `01_mars_data_preparation.ipynb` | Download curated global Mars layers, align them, calculate features, and export the Mars process-discovery input |
+| 2 | `02_moon_data_preparation.ipynb` | Download curated global and polar Moon layers, align them, calculate features, and export the Moon process-discovery input |
+| 3 | `03_mars_region_discovery.ipynb` | Create and interpret multiscale homogeneous Mars regions |
+| 4 | `04_moon_region_discovery.ipynb` | Create and interpret multiscale homogeneous Moon regions |
 
+Only completed, runnable notebooks should be added. The table defines the implementation sequence; it is not a claim that these files already exist.

@@ -2,8 +2,8 @@
 
 ## Project workflow
 
-1. [PDS data feasibility notebook](notebooks/01_pds_data_feasibility.ipynb) — inventory and validate usable Moon/Mars measurements before modeling.
-2. [Data feasibility design](docs/data-feasibility-design.md) — scientific and engineering requirements for the first stage.
-3. [Process discovery design](docs/process-discovery-design.md) — planned homogeneous-region and process-interpretation pipeline.
+1. [Planetary data preparation](docs/data-preparation-design.md) — build separate, aligned Mars and Moon feature datasets from curated PDS products.
+2. [Process discovery](docs/process-discovery-design.md) — create homogeneous regions, discover recurring region types, and interpret them with scientific evidence recipes.
+3. Earth filtering — translate validated planetary evidence into measurable Earth variables and rank terrestrial regions.
 
 The NASA PDS API documentation is tracked as a Git submodule under `ressources/pds-api`.
