@@ -37,6 +37,8 @@ Clustering discovers recurring property combinations. It does not prove their ca
 
 The screening recipes explicitly retain missing confirmation evidence and alternative explanations. They do not establish current activity, and they do not replace targeted CTX/HiRISE, CRISM, THEMIS, SHARAD, or repeat-observation refinement.
 
+A coverage cohort with at least two usable features may still support descriptive segmentation and neutral clustering. If those features come from only one science family, its regions and recipe results are explicitly marked `limited_feature_evidence`; they are not treated as strong multi-property process evidence.
+
 ## Step 1 — Multiscale homogeneous regions
 
 A homogeneous region is a connected area whose selected properties vary within stated tolerances at a stated spatial scale.
