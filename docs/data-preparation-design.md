@@ -174,11 +174,22 @@ These describe the surface without assigning a process.
 
 ### Numeric scaling
 
-Store unscaled values and a separate model-ready version. Fit scaling parameters on the training geography only. Candidate methods are robust scaling for variables with outliers and standard scaling for approximately symmetric variables. Scaling parameters are saved and reused; they are not recomputed on evaluation regions.
+Store unscaled values and a separate model-ready version. Fit robust medians and interquartile ranges on the training geography only, then save and reuse those parameters. Do not refit them on evaluation regions.
+
+Every exported column has an explicit role in `feature_schema.csv`:
+
+- `science_default`: allowed into the recommended clustering input.
+- `science_optional`: physically meaningful, but excluded by default because it is redundant or answers a narrower question.
+- `quality_context`: coverage, fit error, and confidence information used to test clusters for artifacts, never to define the default clusters.
+- `geographic_context`: coordinates, spatial folds, and resolution metadata used for spatial validation, never to define the default clusters.
+
+The model-ready columns use the prefix `model__`. After robust scaling, each science family is weighted by `1 / sqrt(number of default features in that family)`. This prevents a family such as composition from dominating only because it has more columns than terrain or reflectance.
 
 ### Spectral compression
 
-Use PCA first for high-dimensional mineral spectra because its components and explained variance can be inspected. Select the component count from reconstruction/explained-variance results rather than a fixed guess. Preserve the original quality-masked spectra outside the clustering table.
+Use PCA first for high-dimensional spectra because its components and explained variance can be inspected. For Mars TES emissivity, preserve overall level separately, calculate spectral contrast, mean-centre each spectrum, and fit PCA to spectral shape only. This avoids duplicating albedo through a dominant brightness component. Select the component count from training explained variance, verify reconstruction on held-out geographic blocks, and preserve the original source cube outside the clustering table.
+
+TES mineral-abundance maps remain available in raw form for interpretation. The default clustering columns are separate quality-masked copies. Their mask uses valid-band coverage and a mineral-fit RMS threshold fitted only on training geography, so a weak fit becomes missing data rather than a false zero abundance.
 
 An autoencoder is considered only if PCA reconstruction removes important spectral structure. It must be compared with PCA using held-out reconstruction, stability of downstream clusters, and interpretability. An autoencoder is not automatically preferred because GPUs are available.
 
@@ -254,9 +265,10 @@ Every prepared layer must have a manifest entry containing:
 6. Build separate coarse and medium Mars grids; reserve fine products for regional refinement.
 7. Reproject and aggregate without exceeding effective source resolution.
 8. Calculate neutral terrain, thermal, statistical, and texture features.
-9. Normalize numeric features and fit PCA for spectra; benchmark image embeddings against simple texture features.
-10. Export rasters, masks, fitted transforms, provenance, and `mars_cells_input.parquet`.
-11. Show coverage, missingness, resolution, and value-distribution diagnostics.
+9. Separate science, optional, quality, and geographic fields; robust-scale default science features on training geography and balance feature families.
+10. Separate TES emissivity level from spectral shape, fit PCA to shape, and create quality-masked mineral copies.
+11. Export rasters, masks, feature schema, fitted transforms, provenance, and `mars_cells_input.parquet`.
+12. Show coverage, quality, redundancy, and spectral-compression diagnostics.
 
 ### `02_moon_data_preparation.ipynb`
 
