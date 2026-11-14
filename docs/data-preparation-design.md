@@ -174,16 +174,16 @@ These describe the surface without assigning a process.
 
 ### Numeric scaling
 
-Store unscaled values and a separate model-ready version. Fit robust medians and interquartile ranges on the training geography only, then save and reuse those parameters. Do not refit them on evaluation regions.
+Store unscaled values and a separate model-ready version. Fit robust medians and interquartile ranges on the training geography only, then save and reuse those parameters. A sparse, zero-heavy variable whose IQR is zero uses a wider central percentile span; a genuinely constant or insufficiently observed variable is recorded and excluded from the model representation. Do not refit any scaling parameter on evaluation regions.
 
 Every exported column has an explicit role in `feature_schema.csv`:
 
-- `science_default`: allowed into the recommended clustering input.
+- `science_default`: requested for the recommended clustering input; the exported `active_for_model` flag confirms that the run found enough variation and coverage to use it.
 - `science_optional`: physically meaningful, but excluded by default because it is redundant or answers a narrower question.
 - `quality_context`: coverage, fit error, and confidence information used to test clusters for artifacts, never to define the default clusters.
 - `geographic_context`: coordinates, spatial folds, and resolution metadata used for spatial validation, never to define the default clusters.
 
-The model-ready columns use the prefix `model__`. After robust scaling, each science family is weighted by `1 / sqrt(number of default features in that family)`. This prevents a family such as composition from dominating only because it has more columns than terrain or reflectance.
+The model-ready columns use the prefix `model__`. After robust scaling, each science family is weighted by `1 / sqrt(number of active features in that family)`. This prevents a family such as composition from dominating only because it has more columns than terrain or reflectance.
 
 ### Spectral compression
 

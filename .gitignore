@@ -1,3 +1,7 @@
 # Locally built or executed notebook artifacts
 build/
 outputs/
+
+# Python bytecode created by local notebook validation
+__pycache__/
+*.py[cod]
