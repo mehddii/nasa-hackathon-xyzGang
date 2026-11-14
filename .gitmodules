@@ -1,0 +1,3 @@
+[submodule "ressources/pds-api"]
+	path = ressources/pds-api
+	url = https://github.com/NASA-PDS/pds-api.git
