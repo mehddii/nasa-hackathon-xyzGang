@@ -7,6 +7,11 @@ reports/
 # Local scratch scripts
 scratch/
 
+# Local credentials — never commit Earthdata tokens
+.env
+.env.*
+!.env.example
+
 # Python bytecode created by local notebook validation
 __pycache__/
 *.py[cod]
