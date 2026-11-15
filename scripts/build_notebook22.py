@@ -23,19 +23,20 @@ if not mars_paths:
 mars=pd.read_parquet(mars_paths[0])
 
 # Match only by explicit shared feature names. No proxy is silently renamed into a mineral/ice measurement.
-earth_names=set(earth['dataset'].astype(str)) if 'dataset' in earth else set()
-mars_numeric=[c for c in mars.select_dtypes(include=np.number).columns if '__q' in c]
 shared=[]
-for e in sorted(earth_names):
-    for m in mars_numeric:
-        if e.lower()==m.rsplit('__q',1)[0].lower():
-            shared.append((e,m.rsplit('__q',1)[0]))
+# Explicit mapping: both values are metres above each body's datum. This is
+# a terrain comparison, not evidence of the same geological process.
+mars_elevation='raw_mean__elevation_mean_m'
+if mars_elevation+'__q50' in mars.columns:
+    for e in earth['dataset'].astype(str).unique():
+        if e.lower().endswith('.hgt'):
+            shared.append((e,mars_elevation))
 rows=[]
 for family in sorted(earth.feature_family.dropna().unique()) if 'feature_family' in earth else []:
     f=earth[earth.feature_family==family]
     names=set(f.dataset.astype(str))
     matched=[x for x in shared if x[0] in names]
-    rows.append({'feature_family':family,'earth_variables':len(names),'shared_mars_variables':len(matched),'status':'scorable' if matched else 'blocked_no_shared_measurements','note':'Scores require common physical variables and matched units.'})
+    rows.append({'feature_family':family,'earth_variables':len(names),'shared_mars_variables':len(matched),'status':'scorable' if matched else 'blocked_no_shared_measurements','note':'Elevation is mapped in metres; SMAP freeze/thaw is retained as Earth evidence but has no Mars counterpart here.'})
 status=pd.DataFrame(rows)
 status.to_csv(out/'matching_readiness.csv',index=False)
 if len(shared):
