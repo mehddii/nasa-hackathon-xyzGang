@@ -22,6 +22,7 @@ The implementation order is now:
 | 15 | `15_mars_ice_permafrost_dynamics.ipynb` | Audit hydrogen, thermal, and seasonal evidence for ice/permafrost; no Earth matching without validated volatile evidence |
 | 16 | `16_mars_water_driven_alteration.ipynb` | Audit CRISM/mineral and geological-context evidence for water-driven alteration; preserve inconclusive status without spectral confirmation |
 | 17 | `17_mars_impact_crater_terrain.ipynb` | Audit independent crater morphology and terrain evidence before any Earth comparison |
+| 18 | `18_validated_mars_process_matching.ipynb` | Use notebook-06's real process registry and review queue to create process-specific Mars distributions and match only processes with available Earth proxies |
 
 Preparation notebooks stop at cell-level data. Region size, shape, internal variation, neighbors, clustering, anomaly detection, and neutral signatures belong to notebooks 3 and 4. Final process interpretation requires the later targeted validation stage described in the design document.
 
