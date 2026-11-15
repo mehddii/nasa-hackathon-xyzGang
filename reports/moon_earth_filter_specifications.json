@@ -1,0 +1,51 @@
+{
+  "polar_cryogenic_cold_trap_isru": {
+    "target_body": "Moon (Artemis South Pole)",
+    "mission_test_focus": "Cryogenic deep drilling, volatile extraction, water purification",
+    "earth_analog_requirements": {
+      "aridity_index_max": 0.2,
+      "mean_annual_temp_c_max": -10.0,
+      "permafrost_ice_presence": true,
+      "max_vegetation_ndvi": 0.05,
+      "target_friction_angle_deg": [
+        38.0,
+        50.0
+      ]
+    },
+    "benchmark_analog_sites": [
+      "Antarctic Dry Valleys",
+      "Devon Island Haughton Crater",
+      "Svalbard Permafrost"
+    ]
+  },
+  "subsurface_lava_tube_shelter": {
+    "target_body": "Moon (Marius Hills / Mare Tranquillitatis)",
+    "mission_test_focus": "Radiation-shielded habitat deployment, underground autonomous LIDAR drone mapping",
+    "earth_analog_requirements": {
+      "volcanic_basalt_bedrock": true,
+      "subterranean_cavity_presence": true,
+      "max_vegetation_ndvi": 0.15,
+      "basalt_index_min": 0.65
+    },
+    "benchmark_analog_sites": [
+      "Lava Beds National Monument (California)",
+      "Lanzarote Lava Tubes (Canary Islands)",
+      "Iceland Volcanic Caves"
+    ]
+  },
+  "basaltic_mare_sintering_plain": {
+    "target_body": "Moon (Mare Basins)",
+    "mission_test_focus": "Heavy lander plume-surface interaction (PSI), microwave sintering for landing pads",
+    "earth_analog_requirements": {
+      "slope_deg_max": 5.0,
+      "unweathered_basaltic_tephra": true,
+      "iron_oxide_index_min": 0.6,
+      "max_vegetation_ndvi": 0.08
+    },
+    "benchmark_analog_sites": [
+      "Kilauea / Mauna Kea Basalt (Hawaii)",
+      "Morocco Anti-Atlas Basaltic Plateaus",
+      "Black Point Lava Flow (Arizona)"
+    ]
+  }
+}

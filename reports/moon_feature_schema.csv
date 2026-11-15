@@ -1,0 +1,14 @@
+feature,group,role,reason,active_for_model
+elevation_m,terrain,science_default,Absolute planetary reference datum,True
+slope_deg,terrain,science_default,Rover mobility and lander stability limit,True
+roughness_m,terrain,science_default,Local boulder hazard and terramechanics,True
+relief_m,terrain,science_optional,Crater rim peak-to-trough relief,True
+friction_angle_deg,terramechanics,science_default,Soil shear resistance and wheel sinkage,True
+t_max_k,thermal,science_default,Maximum thermal constraint on volatile survival,True
+thermal_swing_k,thermal,science_default,Thermal fatigue on habitat structures,True
+cold_trap_water_ice,volatiles,science_default,Water-ice volatile preservation index,True
+grazing_shadow_ratio,illumination,science_default,Extreme polar shadow and optical hazard,True
+artemis_suitability_score,mission,science_optional,Composite Artemis site index,True
+albedo,reflectance,science_default,Mare basalt vs highland anorthosite distinction,True
+lend_neutron_flux,hydrogen,science_default,Epithermal neutron suppression (ISRU water),True
+minirf_cpr,radar,science_default,Volumetric ice vs blocky ejecta backscatter,True

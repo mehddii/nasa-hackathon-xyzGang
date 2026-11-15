@@ -1,0 +1,94 @@
+{
+  "creation_timestamp": "2026-11-15T00:42:54.076368+00:00",
+  "target_body": "Moon",
+  "mission": "Lunar Reconnaissance Orbiter (LRO)",
+  "instruments": [
+    "LOLA",
+    "Diviner",
+    "LROC WAC",
+    "LEND",
+    "Mini-RF"
+  ],
+  "scales": [
+    "medium_1deg",
+    "coarse_10deg",
+    "polar_south"
+  ],
+  "total_cells_exported": 64800,
+  "polar_cells_exported": 3600,
+  "artemis_candidate_sites": [
+    {
+      "site_name": "Shackleton_Connecting_Ridge",
+      "target_type": "polar_base",
+      "lat": -89.44,
+      "lon": 124.0,
+      "primary_resource": "water_ice_psr",
+      "target_body": "Moon"
+    },
+    {
+      "site_name": "Malapert_Mountain_Peak",
+      "target_type": "polar_base",
+      "lat": -85.99,
+      "lon": 2.93,
+      "primary_resource": "continuous_solar_pel",
+      "target_body": "Moon"
+    },
+    {
+      "site_name": "Haworth_Crater_Rim",
+      "target_type": "polar_base",
+      "lat": -87.4,
+      "lon": -5.1,
+      "primary_resource": "deep_cold_trap",
+      "target_body": "Moon"
+    },
+    {
+      "site_name": "Faustini_Rim_A",
+      "target_type": "polar_base",
+      "lat": -87.1,
+      "lon": 77.0,
+      "primary_resource": "water_ice_psr",
+      "target_body": "Moon"
+    },
+    {
+      "site_name": "de_Gerlache_Rim",
+      "target_type": "polar_base",
+      "lat": -88.5,
+      "lon": -88.3,
+      "primary_resource": "low_angle_illumination",
+      "target_body": "Moon"
+    },
+    {
+      "site_name": "Nobile_Rim_1",
+      "target_type": "polar_base",
+      "lat": -85.2,
+      "lon": 53.5,
+      "primary_resource": "volatile_trapping",
+      "target_body": "Moon"
+    },
+    {
+      "site_name": "Marius_Hills_Hole",
+      "target_type": "lava_tube_pit",
+      "lat": 14.09,
+      "lon": -56.77,
+      "primary_resource": "subsurface_shelter",
+      "target_body": "Moon"
+    },
+    {
+      "site_name": "Mare_Tranquillitatis_Pit",
+      "target_type": "lava_tube_pit",
+      "lat": 8.33,
+      "lon": 33.22,
+      "primary_resource": "subsurface_shelter",
+      "target_body": "Moon"
+    },
+    {
+      "site_name": "Lacus_Mortis_Pit",
+      "target_type": "lava_tube_pit",
+      "lat": 27.29,
+      "lon": 27.23,
+      "primary_resource": "subsurface_shelter",
+      "target_body": "Moon"
+    }
+  ],
+  "pds_compliance": true
+}
