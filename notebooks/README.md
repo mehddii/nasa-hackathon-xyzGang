@@ -14,6 +14,7 @@ The implementation order is now:
 | 6 | `06_mars_process_validation.ipynb` | Connect Mars neutral regions to literature-defined evidence requirements; rank candidate regions for targeted follow-up; export process distributions and controls without assigning unsupported labels |
 | 7 | `07_mars_candidate_validation.ipynb` | Test Mars candidates with separate thermophysical variables and targeted CRISM/SHARAD searches; preserve inconclusive cases; export a validated dust-compatible environment distribution while keeping process-based Earth matching closed |
 | 8 | `08_earth_dust_environment_matching.ipynb` | Query actual Earth climatology through NASA POWER, compare it with the Mars dust-compatible distribution using rank, joint, and spatial scores, and inventory MODIS follow-up coverage through CMR |
+| 9 | `09_earth_refined_validation.ipynb` | Refine the top Earth candidates on a 1° local grid, apply a real land mask, re-query NASA POWER, and inventory higher-resolution MODIS follow-up coverage through CMR |
 
 Preparation notebooks stop at cell-level data. Region size, shape, internal variation, neighbors, clustering, anomaly detection, and neutral signatures belong to notebooks 3 and 4. Final process interpretation requires the later targeted validation stage described in the design document.
 
