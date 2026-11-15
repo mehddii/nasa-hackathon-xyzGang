@@ -15,3 +15,5 @@ scratch/
 # Python bytecode created by local notebook validation
 __pycache__/
 *.py[cod]
+
+.kaggle/

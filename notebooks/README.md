@@ -20,4 +20,6 @@ Preparation notebooks stop at cell-level data. Region size, shape, internal vari
 
 The post-notebook Earth package is implemented in `scripts/mars_earth_analog_pipeline.py` and configured by `configs/mars_process_specifications.json`. It requires real Mars process distributions and Earth proxy tables; it does not create fallback data. The pre-run audit is recorded in `reports/mars_workflow_audit.md`.
 
+After the validated Kaggle run, `10_mars_final_package.ipynb` assembles the refined candidate table, top-location CSV, ranked-candidate map, run summary, and plain-language limitations report.
+
 Only completed, runnable notebooks should be added. The table defines the implementation sequence; it is not a claim that these files already exist.
