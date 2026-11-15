@@ -6,6 +6,8 @@
 2. [Process discovery](docs/process-discovery-design.md) — create homogeneous regions, discover recurring region types, and interpret them with scientific evidence recipes.
 3. Earth filtering — translate validated planetary evidence into measurable Earth variables and rank terrestrial regions.
 
+For continuation, see the [next-steps handoff](docs/next-steps-handoff.md), which defines the five remaining stages and the immediate Earth-screening and validation work.
+
 Implemented notebooks:
 
 - [`01_mars_data_preparation.ipynb`](notebooks/01_mars_data_preparation.ipynb)
