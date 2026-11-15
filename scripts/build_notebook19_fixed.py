@@ -83,11 +83,36 @@ with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as bundle:
         if p.is_file(): bundle.write(p, arcname=p.name)
 decoded_rows = []
 try:
-    import numpy as np, h5py
+    import numpy as np, h5py, zipfile
     for row in downloads[downloads.downloaded].to_dict('records'):
         path = Path(row['local_path'])
-        if path.suffix.lower() not in ('.h5', '.hdf5', '.nc', '.he5'): continue
-        with h5py.File(path, 'r') as handle:
+        if path.suffix.lower()=='.zip':
+            with zipfile.ZipFile(path) as bundle:
+                for member in bundle.namelist():
+                    if not member.lower().endswith('.hgt'): continue
+                    raw = bundle.read(member)
+                    values=np.frombuffer(raw,dtype='>i2').astype('float64')
+                    values=values[values > -32768]
+                    if values.size:
+                        decoded_rows.append({'product': row['product'], 'dataset': member, 'shape': str(values.shape), 'count': int(values.size), 'mean': float(values.mean()), 'std': float(values.std()), 'min': float(values.min()), 'max': float(values.max())})
+            continue
+        if path.suffix.lower() not in ('.h5', '.hdf5', '.nc', '.he5', '.hdf'): continue
+        try:
+            handle=h5py.File(path, 'r')
+        except Exception:
+            try:
+                from pyhdf.SD import SD, SDC
+                handle=None
+                sd=SD(str(path), SDC.READ)
+                for name, info in sd.datasets().items():
+                    values=np.asarray(sd.select(name).get(),dtype='float64').ravel()
+                    values=values[np.isfinite(values)]
+                    if values.size:
+                        decoded_rows.append({'product': row['product'], 'dataset': name, 'shape': str(values.shape), 'count': int(values.size), 'mean': float(values.mean()), 'std': float(values.std()), 'min': float(values.min()), 'max': float(values.max())})
+                sd.end(); continue
+            except Exception:
+                continue
+        with handle:
             def visit(name, obj):
                 if not hasattr(obj, 'shape') or not np.issubdtype(obj.dtype, np.number) or obj.size == 0: return
                 values = np.asarray(obj[...], dtype='float64').ravel()
@@ -95,6 +120,7 @@ try:
                 if values.size:
                     decoded_rows.append({'product': row['product'], 'dataset': name, 'shape': str(obj.shape), 'count': int(values.size), 'mean': float(values.mean()), 'std': float(values.std()), 'min': float(values.min()), 'max': float(values.max())})
             handle.visititems(visit)
+        handle.close()
 except Exception as exc:
     decoded_rows.append({'product': '__decoder__', 'dataset': '__decode_error__', 'error': f'{type(exc).__name__}: {exc}'})
 decoded = pd.DataFrame(decoded_rows)
