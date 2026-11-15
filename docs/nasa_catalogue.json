@@ -1,0 +1,900 @@
+{
+  "metadata": {
+    "created_by_teammate": "2026-11-15",
+    "audited": "2026-11-15",
+    "purpose": "Candidate Earthdata collection inventory for later Earth analogue feature selection",
+    "verification_scope": "Collection identity fields were matched against NASA CMR. Scientific variables, QA rules, scale factors, and suitability were intentionally not inferred.",
+    "cmr_base": "https://cmr.earthdata.nasa.gov/search",
+    "unique_collections": 55
+  },
+  "important_limitations": [
+    "Inclusion is not evidence that a collection is useful for a specific planetary-process match.",
+    "Read the official product user guide before using variables, quality flags, scale factors, spatial resolution, or temporal resolution.",
+    "CMR collection metadata describes products; it is not a substitute for inspecting the actual science arrays and their attributes.",
+    "Dataset access and authentication requirements may change."
+  ],
+  "categories": [
+    {
+      "id": "cat_01_land_vegetation",
+      "topic": "Land Surface",
+      "label": "Land Cover / Vegetation / NDVI / Crops",
+      "collections": [
+        {
+          "concept_id": "C2327962326-LPCLOUD",
+          "short_name": "MOD13A3",
+          "version": "061",
+          "title": "MODIS/Terra Vegetation Indices Monthly L3 Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MOD13A3.061",
+          "processing_level": "3",
+          "time_start": "2000-02-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2327962326-LPCLOUD"
+        },
+        {
+          "concept_id": "C2565788905-LPCLOUD",
+          "short_name": "MOD13A2",
+          "version": "061",
+          "title": "MODIS/Terra Vegetation Indices 16-Day L3 Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MOD13A2.061",
+          "processing_level": "3",
+          "time_start": "2000-02-18T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2565788905-LPCLOUD"
+        },
+        {
+          "concept_id": "C1748066515-LPCLOUD",
+          "short_name": "MOD13Q1",
+          "version": "061",
+          "title": "MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MOD13Q1.061",
+          "processing_level": "3",
+          "time_start": "2000-02-18T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1748066515-LPCLOUD"
+        },
+        {
+          "concept_id": "C2519127224-LPCLOUD",
+          "short_name": "VNP13A1",
+          "version": "002",
+          "title": "VIIRS/NPP Vegetation Indices 16-Day L3 Global 500m SIN Grid V002",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/VIIRS/VNP13A1.002",
+          "processing_level": "3",
+          "time_start": "2012-01-17T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2519127224-LPCLOUD"
+        },
+        {
+          "concept_id": "C2021957657-LPCLOUD",
+          "short_name": "HLSL30",
+          "version": "2.0",
+          "title": "HLS Landsat Operational Land Imager Surface Reflectance and TOA Brightness Daily Global 30m v2.0",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/HLS/HLSL30.002",
+          "processing_level": "3",
+          "time_start": "2013-04-11T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "COG"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2021957657-LPCLOUD"
+        },
+        {
+          "concept_id": "C2021957295-LPCLOUD",
+          "short_name": "HLSS30",
+          "version": "2.0",
+          "title": "HLS Sentinel-2 Multi-spectral Instrument Surface Reflectance Daily Global 30m v2.0",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/HLS/HLSS30.002",
+          "processing_level": "3",
+          "time_start": "2015-11-28T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "COG"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2021957295-LPCLOUD"
+        },
+        {
+          "concept_id": "C2484079608-LPCLOUD",
+          "short_name": "MCD12Q1",
+          "version": "061",
+          "title": "MODIS/Terra+Aqua Land Cover Type Yearly L3 Global 500m SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MCD12Q1.061",
+          "processing_level": "3",
+          "time_start": "2001-01-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2484079608-LPCLOUD"
+        },
+        {
+          "concept_id": "C2565794049-LPCLOUD",
+          "short_name": "MYD13A2",
+          "version": "061",
+          "title": "MODIS/Aqua Vegetation Indices 16-Day L3 Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MYD13A2.061",
+          "processing_level": "3",
+          "time_start": "2002-07-04T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2565794049-LPCLOUD"
+        }
+      ]
+    },
+    {
+      "id": "cat_02_active_fires",
+      "topic": "Fire & Burned Area",
+      "label": "Active Fires / Burned Area / Wildfire Risk",
+      "collections": [
+        {
+          "concept_id": "C2565791018-LPCLOUD",
+          "short_name": "MOD14A2",
+          "version": "061",
+          "title": "MODIS/Terra Thermal Anomalies/Fire 8-Day L3 Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MOD14A2.061",
+          "processing_level": "3",
+          "time_start": "2000-02-18T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2565791018-LPCLOUD"
+        },
+        {
+          "concept_id": "C2565786756-LPCLOUD",
+          "short_name": "MCD64A1",
+          "version": "061",
+          "title": "MODIS/Terra+Aqua Direct Broadcast Burned Area Monthly L3 Global 500m SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MCD64A1.061",
+          "processing_level": "3",
+          "time_start": "2000-11-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2565786756-LPCLOUD"
+        },
+        {
+          "concept_id": "C2847928673-LPCLOUD",
+          "short_name": "VNP64A1",
+          "version": "002",
+          "title": "VIIRS/NPP Burned Area Monthly L4 Global 500m SIN Grid V002",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/VIIRS/VNP64A1.002",
+          "processing_level": "4",
+          "time_start": "2012-03-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2847928673-LPCLOUD"
+        },
+        {
+          "concept_id": "C2105705664-LANCEMODIS",
+          "short_name": "MCD14DL",
+          "version": "6.1NRT",
+          "title": "MODIS/Aqua Terra Thermal Anomalies/Fire locations 1km FIRMS NRT (Vector data)",
+          "provider": "LANCEMODIS",
+          "doi": "10.5067/FIRMS/MODIS/MCD14DL.NRT.0061",
+          "processing_level": "2",
+          "time_start": "2019-12-15T00:00:00.000Z",
+          "time_end": "",
+          "file_formats": [
+            "Text File"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2105705664-LANCEMODIS"
+        }
+      ]
+    },
+    {
+      "id": "cat_03_precipitation",
+      "topic": "Hydrology",
+      "label": "Precipitation / Floods / Drought / Soil Moisture",
+      "collections": [
+        {
+          "concept_id": "C2723754864-GES_DISC",
+          "short_name": "GPM_3IMERGDF",
+          "version": "07",
+          "title": "GPM IMERG Final Precipitation L3 1 day 0.1 degree x 0.1 degree V07 (GPM_3IMERGDF)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/GPM/IMERGDF/DAY/07",
+          "processing_level": "3",
+          "time_start": "1998-01-01T00:00:00.000Z",
+          "time_end": "2025-09-30T23:59:59.999Z",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2723754864-GES_DISC"
+        },
+        {
+          "concept_id": "C2723754847-GES_DISC",
+          "short_name": "GPM_3IMERGHH",
+          "version": "07",
+          "title": "GPM IMERG Final Precipitation L3 Half Hourly 0.1 degree x 0.1 degree V07 (GPM_3IMERGHH)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/GPM/IMERG/3B-HH/07",
+          "processing_level": "3",
+          "time_start": "1998-01-01T00:00:00.000Z",
+          "time_end": "2025-09-30T23:59:59.999Z",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2723754847-GES_DISC"
+        },
+        {
+          "concept_id": "C2938664585-NSIDC_CPRD",
+          "short_name": "SPL3SMP",
+          "version": "009",
+          "title": "SMAP L3 Radiometer Global Daily 36 km EASE-Grid Soil Moisture V009",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/4XXOGX0OOW1S",
+          "processing_level": "3",
+          "time_start": "2015-03-31T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2938664585-NSIDC_CPRD"
+        },
+        {
+          "concept_id": "C3480440870-NSIDC_CPRD",
+          "short_name": "SPL4SMGP",
+          "version": "008",
+          "title": "SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Geophysical Data V008",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/T5RUATAQREF8",
+          "processing_level": "4",
+          "time_start": "2015-03-31T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3480440870-NSIDC_CPRD"
+        },
+        {
+          "concept_id": "C3195527175-POCLOUD",
+          "short_name": "TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4",
+          "version": "RL06.3Mv04",
+          "title": "JPL GRACE and GRACE-FO Mascon Ocean, Ice, and Hydrology Equivalent Water Height Coastal Resolution Improvement (CRI) Filtered Release 06.3 Version 04",
+          "provider": "POCLOUD",
+          "doi": "10.5067/TEMSC-3JC634",
+          "processing_level": "3",
+          "time_start": "2002-04-04T00:00:00.000Z",
+          "time_end": "",
+          "file_formats": [
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3195527175-POCLOUD"
+        },
+        {
+          "concept_id": "C3193285193-POCLOUD",
+          "short_name": "TELLUS_GRFO_L3_CSR_RL06.3_LND_v04",
+          "version": "RL06.3v04",
+          "title": "CSR TELLUS GRACE-FO Level-3 Monthly Land Water-Equivalent-Thickness Surface Mass Anomaly Release 6.3 version 04",
+          "provider": "POCLOUD",
+          "doi": "10.5067/GFLND-3C634",
+          "processing_level": "3",
+          "time_start": "2018-05-22T00:00:00.000Z",
+          "time_end": "",
+          "file_formats": [
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3193285193-POCLOUD"
+        }
+      ]
+    },
+    {
+      "id": "cat_04_temperature",
+      "topic": "Temperature & Climate",
+      "label": "Temperature / Land Surface / Climate Reanalysis",
+      "collections": [
+        {
+          "concept_id": "C1276812863-GES_DISC",
+          "short_name": "M2T1NXSLV",
+          "version": "5.12.4",
+          "title": "MERRA-2 tavg1_2d_slv_Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Single-Level Diagnostics 0.625 x 0.5 degree V5.12.4 (M2T1NXSLV) ",
+          "provider": "GES_DISC",
+          "doi": "10.5067/VJAFPLI1CSIV",
+          "processing_level": "4",
+          "time_start": "1980-01-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1276812863-GES_DISC"
+        },
+        {
+          "concept_id": "C1276812843-GES_DISC",
+          "short_name": "M2SDNXSLV",
+          "version": "5.12.4",
+          "title": "MERRA-2 statD_2d_slv_Nx: 2d,Daily,Aggregated Statistics,Single-Level,Assimilation,Single-Level Diagnostics 0.625 x 0.5 degree V5.12.4 (M2SDNXSLV)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/9SC1VNTWGWV3",
+          "processing_level": "4",
+          "time_start": "1980-01-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1276812843-GES_DISC"
+        },
+        {
+          "concept_id": "C1342986035-GES_DISC",
+          "short_name": "GLDAS_NOAH025_3H",
+          "version": "2.1",
+          "title": "GLDAS Noah Land Surface Model L4 3 hourly 0.25 x 0.25 degree V2.1 (GLDAS_NOAH025_3H)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/E7TYRXPJKWOQ",
+          "processing_level": "4",
+          "time_start": "2000-01-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1342986035-GES_DISC"
+        },
+        {
+          "concept_id": "C1342986036-GES_DISC",
+          "short_name": "GLDAS_NOAH025_M",
+          "version": "2.1",
+          "title": "GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.1 (GLDAS_NOAH025_M)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/SXAVCZFAQLNO",
+          "processing_level": "4",
+          "time_start": "2000-01-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1342986036-GES_DISC"
+        }
+      ]
+    },
+    {
+      "id": "cat_05_air_quality",
+      "topic": "Atmosphere",
+      "label": "Air Quality / Aerosols / Atmospheric Composition",
+      "collections": [
+        {
+          "concept_id": "C3333493715-GES_DISC",
+          "short_name": "OMNO2d",
+          "version": "004",
+          "title": "OMI/Aura NO2 Cloud-Screened Total and Tropospheric Column L3 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2d) ",
+          "provider": "GES_DISC",
+          "doi": "10.5067/AURA/OMI/DATA3407",
+          "processing_level": "3",
+          "time_start": "2004-10-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3333493715-GES_DISC"
+        },
+        {
+          "concept_id": "C1266136113-GES_DISC",
+          "short_name": "OMSO2G",
+          "version": "003",
+          "title": "OMI/Aura Sulphur Dioxide (SO2) Total Column Daily L2 Global Gridded 0.125 degree x 0.125 degree V3 (OMSO2G) ",
+          "provider": "GES_DISC",
+          "doi": "10.5067/Aura/OMI/DATA2023",
+          "processing_level": "2G",
+          "time_start": "2004-10-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1266136113-GES_DISC"
+        },
+        {
+          "concept_id": "C1443420430-LAADS",
+          "short_name": "MOD04_3K",
+          "version": "6.1",
+          "title": "MODIS/Terra Aerosol 5-Min L2 Swath 3km",
+          "provider": "LAADS",
+          "doi": "10.5067/MODIS/MOD04_3K.061",
+          "processing_level": "2",
+          "time_start": "2000-02-24T00:05:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1443420430-LAADS"
+        },
+        {
+          "concept_id": "C1443528505-LAADS",
+          "short_name": "MYD04_3K",
+          "version": "6.1",
+          "title": "MODIS/Aqua Aerosol 5-Min L2 Swath 3km",
+          "provider": "LAADS",
+          "doi": "10.5067/MODIS/MYD04_3K.061",
+          "processing_level": "2",
+          "time_start": "2002-07-04T00:45:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1443528505-LAADS"
+        },
+        {
+          "concept_id": "C1276812830-GES_DISC",
+          "short_name": "M2T1NXAER",
+          "version": "5.12.4",
+          "title": "MERRA-2 tavg1_2d_aer_Nx: 2d,1-Hourly,Time-averaged,Single-Level,Assimilation,Aerosol Diagnostics 0.625 x 0.5 degree V5.12.4 (M2T1NXAER) ",
+          "provider": "GES_DISC",
+          "doi": "10.5067/KLICLTZ8EM9D",
+          "processing_level": "4",
+          "time_start": "1980-01-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1276812830-GES_DISC"
+        },
+        {
+          "concept_id": "C2089270961-GES_DISC",
+          "short_name": "S5P_L2__NO2____HiR",
+          "version": "2",
+          "title": "Sentinel-5P TROPOMI Tropospheric NO2 1-Orbit L2 5.5km x 3.5km V2 (S5P_L2__NO2____HiR) ",
+          "provider": "GES_DISC",
+          "doi": "10.5270/S5P-9bnp8q8",
+          "processing_level": "2",
+          "time_start": "2018-04-30T00:41:24.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2089270961-GES_DISC"
+        },
+        {
+          "concept_id": "C2324689816-LPCLOUD",
+          "short_name": "MCD19A2",
+          "version": "061",
+          "title": "MODIS/Terra+Aqua Land Aerosol Optical Depth Daily L2G Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MCD19A2.061",
+          "processing_level": "2G",
+          "time_start": "2000-02-24T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2324689816-LPCLOUD"
+        }
+      ]
+    },
+    {
+      "id": "cat_06_oceans",
+      "topic": "Ocean",
+      "label": "Oceans / Sea Surface Temperature / Ocean Color",
+      "collections": [
+        {
+          "concept_id": "C1996881146-POCLOUD",
+          "short_name": "MUR-JPL-L4-GLOB-v4.1",
+          "version": "4.1",
+          "title": "GHRSST Level 4 MUR Global Foundation Sea Surface Temperature Analysis (v4.1)",
+          "provider": "POCLOUD",
+          "doi": "10.5067/GHGMR-4FJ04",
+          "processing_level": "4",
+          "time_start": "2002-05-31T21:00:00.000Z",
+          "time_end": "",
+          "file_formats": [
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1996881146-POCLOUD"
+        },
+        {
+          "concept_id": "C2036880657-POCLOUD",
+          "short_name": "MUR25-JPL-L4-GLOB-v04.2",
+          "version": "4.2",
+          "title": "GHRSST Level 4 MUR 0.25deg Global Foundation Sea Surface Temperature Analysis (v4.2)",
+          "provider": "POCLOUD",
+          "doi": "10.5067/GHM25-4FJ42",
+          "processing_level": "4",
+          "time_start": "2002-08-31T21:00:00.000Z",
+          "time_end": "",
+          "file_formats": [
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2036880657-POCLOUD"
+        },
+        {
+          "concept_id": "C3380709133-OB_CLOUD",
+          "short_name": "MODISA_L3m_CHL",
+          "version": "2022.0",
+          "title": "Aqua MODIS Level-3 Global Mapped Chlorophyll (CHL) Data, version 2022.0",
+          "provider": "OB_CLOUD",
+          "doi": "10.5067/AQUA/MODIS/L3M/CHL/2022.0",
+          "processing_level": "3",
+          "time_start": "2002-07-04T00:00:00Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3380709133-OB_CLOUD"
+        },
+        {
+          "concept_id": "C3233945000-POCLOUD",
+          "short_name": "SWOT_L2_LR_SSH_D",
+          "version": "D",
+          "title": "SWOT Level 2 KaRIn Low Rate Sea Surface Height Data Product, Version D",
+          "provider": "POCLOUD",
+          "doi": "10.5067/SWOT-SSH-D",
+          "processing_level": "2",
+          "time_start": "2022-12-16T00:00:00.000Z",
+          "time_end": "",
+          "file_formats": [
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3233945000-POCLOUD"
+        },
+        {
+          "concept_id": "C3380708980-OB_CLOUD",
+          "short_name": "MODISA_L2_OC",
+          "version": "2022.0",
+          "title": "Aqua MODIS Level-2 Regional  Ocean Color (OC) Data, version 2022.0",
+          "provider": "OB_CLOUD",
+          "doi": "10.5067/AQUA/MODIS/L2/OC/2022.0",
+          "processing_level": "2",
+          "time_start": "2002-07-04T00:00:00Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3380708980-OB_CLOUD"
+        }
+      ]
+    },
+    {
+      "id": "cat_07_cryosphere",
+      "topic": "Cryosphere",
+      "label": "Cryosphere / Snow / Sea Ice / Ice Sheets / Glaciers",
+      "collections": [
+        {
+          "concept_id": "C3050353608-NSIDC_CPRD",
+          "short_name": "MOD10CM",
+          "version": "61",
+          "title": "MODIS/Terra Snow Cover Monthly L3 Global 0.05Deg CMG V061",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/MODIS/MOD10CM.061",
+          "processing_level": "3",
+          "time_start": "2000-03-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3050353608-NSIDC_CPRD"
+        },
+        {
+          "concept_id": "C3177837864-NSIDC_CPRD",
+          "short_name": "NSIDC-0079",
+          "version": "4",
+          "title": "Bootstrap Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS V004",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/X5LG68MH013O",
+          "processing_level": "3",
+          "time_start": "1978-11-01T00:00:00.000Z",
+          "time_end": "2025-12-31T23:59:59.999Z",
+          "file_formats": [
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3177837864-NSIDC_CPRD"
+        },
+        {
+          "concept_id": "C3177837840-NSIDC_CPRD",
+          "short_name": "NSIDC-0051",
+          "version": "2",
+          "title": "Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data V002",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/MPYG15WAA4WX",
+          "processing_level": "3",
+          "time_start": "1978-10-26T00:00:00.000Z",
+          "time_end": "2025-12-31T23:59:59.999Z",
+          "file_formats": [
+            "PNG",
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3177837840-NSIDC_CPRD"
+        },
+        {
+          "concept_id": "C3578753623-NSIDC_CPRD",
+          "short_name": "ATL09",
+          "version": "007",
+          "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics V007",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/ATLAS/ATL09.007",
+          "processing_level": "3",
+          "time_start": "2018-10-13T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3578753623-NSIDC_CPRD"
+        },
+        {
+          "concept_id": "C3091267534-NSIDC_CPRD",
+          "short_name": "MYD10CM",
+          "version": "61",
+          "title": "MODIS/Aqua Snow Cover Monthly L3 Global 0.05Deg CMG V061",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/MODIS/MYD10CM.061",
+          "processing_level": "3",
+          "time_start": "2002-07-04T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3091267534-NSIDC_CPRD"
+        },
+        {
+          "concept_id": "C3177837670-NSIDC_CPRD",
+          "short_name": "NISE",
+          "version": "5",
+          "title": "Near-Real-Time SSM/I-SSMIS EASE-Grid Daily Global Ice Concentration and Snow Extent V005",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/3KB2JPLFPK3R",
+          "processing_level": "3",
+          "time_start": "2016-12-01T00:00:00.000Z",
+          "time_end": "2026-01-16T23:59:59.999Z",
+          "file_formats": [
+            "HDF-EOS2"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3177837670-NSIDC_CPRD"
+        },
+        {
+          "concept_id": "C3564876127-NSIDC_CPRD",
+          "short_name": "ATL06",
+          "version": "007",
+          "title": "ATLAS/ICESat-2 L3A Land Ice Height V007",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/ATLAS/ATL06.007",
+          "processing_level": "3",
+          "time_start": "2018-10-14T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3564876127-NSIDC_CPRD"
+        }
+      ]
+    },
+    {
+      "id": "cat_08_elevation",
+      "topic": "Terrain",
+      "label": "Elevation / Terrain / 3D Structure",
+      "collections": [
+        {
+          "concept_id": "C2763266360-LPCLOUD",
+          "short_name": "SRTMGL1",
+          "version": "003",
+          "title": "NASA Shuttle Radar Topography Mission Global 1 arc second V003",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MEASURES/SRTM/SRTMGL1.003",
+          "processing_level": "3",
+          "time_start": "2000-02-11T00:00:00.000Z",
+          "time_end": "2000-02-21T23:59:59.000Z",
+          "file_formats": [
+            "HGT"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2763266360-LPCLOUD"
+        },
+        {
+          "concept_id": "C1711961296-LPCLOUD",
+          "short_name": "ASTGTM",
+          "version": "003",
+          "title": "ASTER Global Digital Elevation Model V003",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/ASTER/ASTGTM.003",
+          "processing_level": "3",
+          "time_start": "2000-03-01T00:00:00.000Z",
+          "time_end": "2013-11-30T23:59:59.999Z",
+          "file_formats": [
+            "COG"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1711961296-LPCLOUD"
+        },
+        {
+          "concept_id": "C2763264762-LPCLOUD",
+          "short_name": "NASADEM_HGT",
+          "version": "001",
+          "title": "NASADEM Merged DEM Global 1 arc second V001",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MEASURES/NASADEM/NASADEM_HGT.001",
+          "processing_level": "3",
+          "time_start": "2000-02-11T00:00:00.000Z",
+          "time_end": "2000-02-21T23:59:59.000Z",
+          "file_formats": [
+            "HGT"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2763264762-LPCLOUD"
+        },
+        {
+          "concept_id": "C3974616135-LPCLOUD",
+          "short_name": "GEDI02_B",
+          "version": "003",
+          "title": "GEDI L2B Canopy Cover and Vertical Profile Metrics Data Global Footprint Level V003",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/GEDI/GEDI02_B.003",
+          "processing_level": "2B",
+          "time_start": "2019-04-04T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3974616135-LPCLOUD"
+        }
+      ]
+    },
+    {
+      "id": "cat_09_human",
+      "topic": "Human Dimensions",
+      "label": "Human Dimensions / Population / Night Lights",
+      "collections": [
+        {
+          "concept_id": "C2980666614-LAADS",
+          "short_name": "VNP46A1",
+          "version": "2",
+          "title": "VIIRS/NPP Daily Gridded Day Night Band 15 arc-second Linear Lat Lon Grid Night V2",
+          "provider": "LAADS",
+          "doi": "10.5067/VIIRS/VNP46A1.002\r\n",
+          "processing_level": "3",
+          "time_start": "2012-01-19T00:00:00.000Z",
+          "time_end": "",
+          "file_formats": [
+            "HDF5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2980666614-LAADS"
+        },
+        {
+          "concept_id": "C3365931269-LAADS",
+          "short_name": "VNP46A2",
+          "version": "2",
+          "title": "VIIRS/NPP Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3 Global 15 arc-second Linear Lat Lon Grid V2",
+          "provider": "LAADS",
+          "doi": "10.5067/VIIRS/VNP46A2.002\n",
+          "processing_level": "3",
+          "time_start": "2012-01-19T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3365931269-LAADS"
+        },
+        {
+          "concept_id": "C3540910651-ESDIS",
+          "short_name": "CIESIN_SEDAC_GPWv4_POPDENS_R11",
+          "version": "4.11",
+          "title": "Gridded Population of the World, Version 4 (GPWv4): Population Density, Revision 11",
+          "provider": "ESDIS",
+          "doi": "10.7927/H49C6VHW",
+          "processing_level": "4",
+          "time_start": "",
+          "time_end": "",
+          "file_formats": [
+            "ASCII",
+            "GeoTIFF",
+            "PDF",
+            "PNG",
+            "WMS",
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3540910651-ESDIS"
+        },
+        {
+          "concept_id": "C3860061042-LAADS",
+          "short_name": "VNP46A3",
+          "version": "2",
+          "title": "VIIRS/NPP Lunar BRDF-Adjusted Nighttime Lights Monthly L3 Global 15 arc second Linear Lat Lon Grid V2",
+          "provider": "LAADS",
+          "doi": "10.5067/VIIRS/VNP46A3.002\n",
+          "processing_level": "3",
+          "time_start": "2012-01-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3860061042-LAADS"
+        },
+        {
+          "concept_id": "C3860065683-LAADS",
+          "short_name": "VNP46A4",
+          "version": "2",
+          "title": "VIIRS/NPP Lunar BRDF-Adjusted Nighttime Lights Yearly L3 Global 15 arc second Linear Lat Lon Grid V2",
+          "provider": "LAADS",
+          "doi": "10.5067/VIIRS/VNP46A4.002\n",
+          "processing_level": "3",
+          "time_start": "2012-01-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "HDF5"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3860065683-LAADS"
+        }
+      ]
+    },
+    {
+      "id": "cat_10_solid_earth",
+      "topic": "Solid Earth",
+      "label": "Solid Earth / Hazards / Deformation / SAR",
+      "collections": [
+        {
+          "concept_id": "C4079844428-LPCLOUD",
+          "short_name": "EMITL2ARFL",
+          "version": "002",
+          "title": "EMIT L2A Surface Reflectance and Uncertainty 60 m V002",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/EMIT/EMITL2ARFL.002",
+          "processing_level": "2A",
+          "time_start": "2022-08-09T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C4079844428-LPCLOUD"
+        },
+        {
+          "concept_id": "C3294057315-ASF",
+          "short_name": "OPERA_L3_DISP-S1_V1",
+          "version": "1",
+          "title": "OPERA Surface Displacement from Sentinel-1 validated product (Version 1)",
+          "provider": "ASF",
+          "doi": "10.5067/SNWG/OPL3DISPS1-V1",
+          "processing_level": "3",
+          "time_start": "2016-07-01T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "PNG",
+            "XML",
+            "Zarr",
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C3294057315-ASF"
+        },
+        {
+          "concept_id": "C2859376221-ASF",
+          "short_name": "ARIA_S1_GUNW",
+          "version": "1",
+          "title": "ARIA Sentinel-1 Geocoded Unwrapped Interferograms",
+          "provider": "ASF",
+          "doi": "",
+          "processing_level": "2",
+          "time_start": "2014-06-15T03:44:43.000Z",
+          "time_end": "ongoing",
+          "file_formats": [
+            "JSON",
+            "PNG",
+            "netCDF-4"
+          ],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2859376221-ASF"
+        },
+        {
+          "concept_id": "C2027429276-GES_DISC",
+          "short_name": "MSVOLSO2L4",
+          "version": "4",
+          "title": "Multi-Satellite Volcanic Sulfur Dioxide L4 Long-Term Global Database V4 (MSVOLSO2L4) ",
+          "provider": "GES_DISC",
+          "doi": "10.5067/MEASURES/SO2/DATA405",
+          "processing_level": "4",
+          "time_start": "1978-10-31T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C2027429276-GES_DISC"
+        },
+        {
+          "concept_id": "C1214470488-ASF",
+          "short_name": "SENTINEL-1A_SLC",
+          "version": "1",
+          "title": "Sentinel-1A Single Look Complex Product",
+          "provider": "ASF",
+          "doi": "",
+          "processing_level": "1",
+          "time_start": "2014-04-03T00:00:00.000Z",
+          "time_end": "ongoing",
+          "file_formats": [],
+          "cmr_record": "https://cmr.earthdata.nasa.gov/search/concepts/C1214470488-ASF"
+        }
+      ]
+    }
+  ]
+}
