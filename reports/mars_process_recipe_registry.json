@@ -1,0 +1,187 @@
+[
+  {
+    "recipe_id": "mafic_igneous_material_candidate",
+    "label": "Mafic igneous material; volcanic origin candidate",
+    "eligible_scales": [
+      "medium_1deg",
+      "coarse_10deg"
+    ],
+    "required_any": [
+      {
+        "feature": "positive_fraction__detection_supported__mineral_olivine",
+        "direction": "high",
+        "percentile": 0.65,
+        "minimum_value": 0.05
+      },
+      {
+        "feature": "positive_fraction__detection_supported__mineral_high_ca_pyroxene",
+        "direction": "high",
+        "percentile": 0.7,
+        "minimum_value": 0.1
+      },
+      {
+        "feature": "positive_fraction__detection_supported__mineral_low_ca_pyroxene",
+        "direction": "high",
+        "percentile": 0.7,
+        "minimum_value": 0.1
+      }
+    ],
+    "supporting": [
+      {
+        "feature": "thermal_inertia_mean",
+        "direction": "high",
+        "percentile": 0.6
+      },
+      {
+        "feature": "relief_m",
+        "direction": "high",
+        "percentile": 0.6
+      },
+      {
+        "feature": "albedo_mean",
+        "direction": "low",
+        "percentile": 0.4
+      }
+    ],
+    "minimum_supporting_passes": 1,
+    "missing_confirmation": "Detailed volcanic morphology and geological unit context",
+    "alternatives": [
+      "Impact-excavated crust",
+      "Transported mafic sediment",
+      "Non-volcanic igneous exposure"
+    ],
+    "activity_status": "not assessed",
+    "sources": [
+      "https://doi.org/10.1029/2005JE002477",
+      "https://doi.org/10.1002/2014JE004690"
+    ]
+  },
+  {
+    "recipe_id": "water_or_hydrothermal_alteration_candidate",
+    "label": "Water-related or hydrothermal alteration candidate",
+    "eligible_scales": [
+      "medium_1deg",
+      "coarse_10deg"
+    ],
+    "required_any": [
+      {
+        "feature": "positive_fraction__detection_supported__mineral_hematite",
+        "direction": "high",
+        "percentile": 0.7,
+        "minimum_value": 0.01
+      },
+      {
+        "feature": "positive_fraction__detection_supported__mineral_sulfates",
+        "direction": "high",
+        "percentile": 0.7,
+        "minimum_value": 0.01
+      },
+      {
+        "feature": "positive_fraction__detection_supported__mineral_carbonates",
+        "direction": "high",
+        "percentile": 0.7,
+        "minimum_value": 0.01
+      }
+    ],
+    "supporting": [
+      {
+        "feature": "positive_fraction__detection_supported__mineral_sheet_silicates_high_si_glass",
+        "direction": "high",
+        "percentile": 0.75,
+        "minimum_value": 0.05
+      },
+      {
+        "feature": "elevation_mean_m",
+        "direction": "low",
+        "percentile": 0.4
+      }
+    ],
+    "minimum_supporting_passes": 1,
+    "missing_confirmation": "High-resolution mineral identification and geological association with the mapped unit",
+    "alternatives": [
+      "Thermal oxidation",
+      "Volcanic glass",
+      "Transported mineral-bearing sediment"
+    ],
+    "activity_status": "past or unknown",
+    "sources": [
+      "https://doi.org/10.1029/2009JE003342",
+      "https://doi.org/10.1029/2007JE003070"
+    ]
+  },
+  {
+    "recipe_id": "dust_or_loose_material_environment",
+    "label": "Dust-mantled or loose-material environment; aeolian susceptibility",
+    "eligible_scales": [
+      "medium_1deg",
+      "coarse_10deg"
+    ],
+    "required_any": [
+      {
+        "feature": "quality_masked__mineral_surface_dust",
+        "direction": "high",
+        "percentile": 0.75
+      },
+      {
+        "feature": "thermal_inertia_mean",
+        "direction": "low",
+        "percentile": 0.25
+      }
+    ],
+    "supporting": [
+      {
+        "feature": "albedo_mean",
+        "direction": "high",
+        "percentile": 0.6
+      },
+      {
+        "feature": "slope_mean_deg",
+        "direction": "low",
+        "percentile": 0.5
+      }
+    ],
+    "minimum_supporting_passes": 1,
+    "missing_confirmation": "Dune/ripple morphology and repeat observations of movement",
+    "alternatives": [
+      "Static dust mantle",
+      "Fine sediment unrelated to active transport",
+      "Low-density or porous material"
+    ],
+    "activity_status": "unknown; static data cannot establish active transport",
+    "sources": [
+      "https://doi.org/10.1029/2007JE003070"
+    ]
+  },
+  {
+    "recipe_id": "hydrogen_enriched_subsurface_environment",
+    "label": "Hydrogen-enriched shallow subsurface environment",
+    "eligible_scales": [
+      "coarse_10deg"
+    ],
+    "required_any": [
+      {
+        "feature": "neutron_epithermal_counts_s",
+        "direction": "low",
+        "percentile": 0.2
+      }
+    ],
+    "supporting": [
+      {
+        "feature": "neutron_fast_counts_s",
+        "direction": "low",
+        "percentile": 0.3
+      }
+    ],
+    "minimum_supporting_passes": 1,
+    "missing_confirmation": "Independent evidence distinguishing ice, hydrated minerals, and other hydrogen-bearing material",
+    "alternatives": [
+      "Hydrated minerals",
+      "Chemically bound hydrogen",
+      "Composition-related neutron response"
+    ],
+    "activity_status": "not applicable",
+    "sources": [
+      "https://doi.org/10.1126/science.1073541"
+    ]
+  }
+]
