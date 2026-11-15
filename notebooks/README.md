@@ -18,4 +18,6 @@ The implementation order is now:
 
 Preparation notebooks stop at cell-level data. Region size, shape, internal variation, neighbors, clustering, anomaly detection, and neutral signatures belong to notebooks 3 and 4. Final process interpretation requires the later targeted validation stage described in the design document.
 
+The post-notebook Earth package is implemented in `scripts/mars_earth_analog_pipeline.py` and configured by `configs/mars_process_specifications.json`. It requires real Mars process distributions and Earth proxy tables; it does not create fallback data. The pre-run audit is recorded in `reports/mars_workflow_audit.md`.
+
 Only completed, runnable notebooks should be added. The table defines the implementation sequence; it is not a claim that these files already exist.

@@ -18,3 +18,13 @@ Implemented notebooks:
 - [`09_earth_refined_validation.ipynb`](notebooks/09_earth_refined_validation.ipynb)
 
 The NASA PDS API documentation is tracked as a Git submodule under `ressources/pds-api`.
+
+## Mars continuation package
+
+The Mars workflow is audited in [`reports/mars_workflow_audit.md`](reports/mars_workflow_audit.md). Process-specific evidence and Earth proxy limitations are declared in [`configs/mars_process_specifications.json`](configs/mars_process_specifications.json). Once the Mars notebooks have produced their Kaggle outputs, run:
+
+```text
+python scripts/mars_earth_analog_pipeline.py --mars <process-distribution.parquet> --earth <earth-features.parquet> --output <run-dir> --process-id fine_particulate_dust_transport
+```
+
+The matcher compares marginal ranges, robust joint distance, neighborhood coherence, and missingness. Its output is a ranked compatibility screen, not proof of an active Martian process.
