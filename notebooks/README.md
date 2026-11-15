@@ -23,6 +23,7 @@ The implementation order is now:
 | 16 | `16_mars_water_driven_alteration.ipynb` | Audit CRISM/mineral and geological-context evidence for water-driven alteration; preserve inconclusive status without spectral confirmation |
 | 17 | `17_mars_impact_crater_terrain.ipynb` | Audit independent crater morphology and terrain evidence before any Earth comparison |
 | 18 | `18_validated_mars_process_matching.ipynb` | Use notebook-06's real process registry and review queue to create process-specific Mars distributions and match only processes with available Earth proxies |
+| 19 | `19_earth_process_data_extraction.ipynb` | Locate direct EMIT mineral-reflectance, MODIS snow, SMAP freeze/thaw, and NASADEM measurement granules for the top Earth candidates before process matching |
 
 Preparation notebooks stop at cell-level data. Region size, shape, internal variation, neighbors, clustering, anomaly detection, and neutral signatures belong to notebooks 3 and 4. Final process interpretation requires the later targeted validation stage described in the design document.
 
