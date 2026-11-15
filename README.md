@@ -11,5 +11,6 @@ Implemented notebooks:
 - [`01_mars_data_preparation.ipynb`](notebooks/01_mars_data_preparation.ipynb)
 - [`03_mars_region_discovery.ipynb`](notebooks/03_mars_region_discovery.ipynb)
 - [`06_mars_process_validation.ipynb`](notebooks/06_mars_process_validation.ipynb)
+- [`07_mars_candidate_validation.ipynb`](notebooks/07_mars_candidate_validation.ipynb)
 
 The NASA PDS API documentation is tracked as a Git submodule under `ressources/pds-api`.

@@ -12,6 +12,7 @@ The implementation order is now:
 | 4 | `04_moon_region_discovery.ipynb` | Merge neighboring Moon cells into multiscale connected regions; build region representations; test artifacts; cluster common types; detect anomalies; export neutral signatures; audit paper-defined evidence before any process labels |
 | 5 | `05_earth_analog_matching.ipynb` | Match validated planetary process distributions to Earth measurements (only after process validation is complete) |
 | 6 | `06_mars_process_validation.ipynb` | Connect Mars neutral regions to literature-defined evidence requirements; rank candidate regions for targeted follow-up; export process distributions and controls without assigning unsupported labels |
+| 7 | `07_mars_candidate_validation.ipynb` | Test Mars candidates with separate thermophysical variables and targeted CRISM/SHARAD searches; preserve inconclusive cases; export a validated dust-compatible environment distribution while keeping process-based Earth matching closed |
 
 Preparation notebooks stop at cell-level data. Region size, shape, internal variation, neighbors, clustering, anomaly detection, and neutral signatures belong to notebooks 3 and 4. Final process interpretation requires the later targeted validation stage described in the design document.
 
