@@ -29,15 +29,17 @@ Clustering discovers recurring property combinations. It does not prove their ca
 `03_mars_region_discovery.ipynb` implements the broad global stage as follows:
 
 1. Analyse each physical scale and compatible coverage cohort separately.
-2. Quantize complete science-feature groups into small property prototypes, then split those prototypes into four-neighbor connected components with longitude wrapping.
-3. Summarize every connected region in physical units, model space, quality context, area, perimeter, internal variation, adjacency, and parent/child scale links.
-4. Compare K-means, diagonal Gaussian mixtures, and HDBSCAN using geographic-fold stability, silhouette separation, and assigned coverage.
-5. Run Isolation Forest anomaly screening, coverage-only cluster prediction, and science-family ablations.
-6. Preserve neutral type identifiers before applying four conservative screening recipes: mafic igneous material, water/hydrothermal alteration, dust or loose material, and hydrogen-enriched subsurface environments.
+2. Quantize complete science-feature groups into area-weighted property prototypes, split them into four-neighbor connected components with longitude wrapping, then merge only adjacent tiny components whose science representations are sufficiently similar.
+3. Summarize every connected region with surface-area-weighted physical values, model-space values, quality context, area, perimeter, internal variation, adjacency, and parent/child scale links.
+4. Remove the regularized linear effect of acquisition-quality variables from the clustering representation while preserving the original physical measurements, then compare K-means, diagonal Gaussian mixtures, and HDBSCAN using geographic-fold stability, silhouette separation, and assigned coverage.
+5. Run Isolation Forest anomaly screening, coverage-only cluster prediction, and science-family ablations. Anomalies from tiny, limited-feature, or artifact-dominated regions remain recorded but are not promoted to the review shortlist.
+6. Preserve neutral type identifiers, then apply four conservative screening recipes to individual connected regions: mafic igneous material, water/hydrothermal alteration, dust or loose material, and hydrogen-enriched subsurface environments. Robust map candidates require direct and independent supporting evidence and exclude artifact-dominated, single-family-only, and unresolved tiny regions.
 
-The screening recipes explicitly retain missing confirmation evidence and alternative explanations. They do not establish current activity, and they do not replace targeted CTX/HiRISE, CRISM, THEMIS, SHARAD, or repeat-observation refinement.
+The screening recipes explicitly retain missing confirmation evidence and alternative explanations. Broad neutral clusters are not painted as processes; recipe evidence is localized to the regions that actually satisfy it. The recipes do not establish current activity, and they do not replace targeted CTX/HiRISE, CRISM, THEMIS, SHARAD, or repeat-observation refinement.
 
 A coverage cohort with at least two usable features may still support descriptive segmentation and neutral clustering. If those features come from only one science family, its regions and recipe results are explicitly marked `limited_feature_evidence`; they are not treated as strong multi-property process evidence.
+
+The Mars notebook sets `earth_filter_handoff_ready` only when robust candidates exist, no partition retains more than 20% unresolved tiny regions, and at least 40% of the reference locations recover an expected broad screening category. A completed run is therefore not automatically considered scientifically ready.
 
 ## Step 1 — Multiscale homogeneous regions
 
