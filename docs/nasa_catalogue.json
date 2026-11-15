@@ -1,0 +1,2523 @@
+{
+  "metadata": {
+    "created": "2026-11-15",
+    "purpose": "Curated NASA Earth science catalogue for ML notebooks",
+    "scope": "10 categories, CMR-verified, all concept_ids live-confirmed",
+    "cmr_base": "https://cmr.earthdata.nasa.gov/search",
+    "total_collections": 56
+  },
+  "auth_guide": {
+    "earthdata_login_url": "https://urs.earthdata.nasa.gov/",
+    "note": "Free account required for all NASA EarthData downloads",
+    "methods": [
+      "Environment vars: EARTHDATA_LOGIN_USERNAME, EARTHDATA_LOGIN_PASSWORD",
+      ".netrc file: machine urs.earthdata.nasa.gov login <user> password <pass>",
+      "earthaccess.login(strategy='interactive') — prompts once, caches token"
+    ],
+    "s3_note": "S3 direct access requires s3credentials endpoint call (auto-handled by earthaccess.open())",
+    "token_note": "earthaccess.login() returns an Auth object; bearer tokens auto-refreshed"
+  },
+  "how_to_fetch": {
+    "python_example": "import earthaccess, xarray as xr\n\n# 1. Login\nearthaccess.login(strategy=\"environment\")\n\n# 2. Search (CMR under the hood)\nresults = earthaccess.search_data(\n    short_name=\"GPM_3IMERGDF\",\n    temporal=(\"2023-06-01\", \"2023-06-30\"),\n    bounding_box=(-120, 25, -65, 50),  # CONUS: west, south, east, north\n    count=10\n)\nprint(f\"Found {len(results)} granules\")\n\n# 3a. Stream (best for cloud, no local storage)\nfiles = earthaccess.open(results)\nds = xr.open_mfdataset(files, group=\"Grid\", engine=\"h5netcdf\")\n\n# 3b. Download subset\nearthaccess.download(results[:2], \"./tmp/\")\n\n# 4. Raw CMR query (no login needed for metadata)\nimport urllib.request, json\nurl = \"https://cmr.earthdata.nasa.gov/search/collections.json?short_name=GPM_3IMERGDF&page_size=1\"\nwith urllib.request.urlopen(url) as r:\n    data = json.loads(r.read())\n    print(data[\"feed\"][\"entry\"][0][\"id\"])"
+  },
+  "spatial_helpers": {
+    "bbox_format": "(west, south, east, north) — WGS84 degrees",
+    "regions": {
+      "CONUS": [
+        -125,
+        24,
+        -66,
+        50
+      ],
+      "EUROPE": [
+        -12,
+        34,
+        45,
+        72
+      ],
+      "AMAZON": [
+        -80,
+        -20,
+        -44,
+        10
+      ],
+      "SAHEL": [
+        -20,
+        10,
+        45,
+        20
+      ],
+      "SE_ASIA": [
+        90,
+        -10,
+        145,
+        30
+      ]
+    },
+    "modis_tile_ref": "https://modis-land.gsfc.nasa.gov/MODLAND_grid.html",
+    "cmr_polygon_example": "polygon=-120,25,-65,25,-65,50,-120,50,-120,25",
+    "opendap_subset_note": "Append .nc4?variable[time][lat][lon] to OPeNDAP URL for server-side subsetting"
+  },
+  "temporal_alignment": {
+    "product_frequencies": {
+      "30-min": [
+        "GPM_3IMERGHH"
+      ],
+      "daily": [
+        "MUR-JPL-L4-GLOB-v4.1",
+        "VNP46A1",
+        "MOD14A2 (8-day fire)",
+        "GPM_3IMERGDF"
+      ],
+      "8-day": [
+        "MOD09A1",
+        "MOD11A2 (LST)"
+      ],
+      "16-day": [
+        "MOD13Q1",
+        "MOD13A2"
+      ],
+      "monthly": [
+        "MOD13A3",
+        "MCD64A1",
+        "MODISA_L3m_CHL",
+        "VNP46A3",
+        "TELLUS_GRAC-GRFO_MASCON"
+      ],
+      "annual": [
+        "MCD12Q1",
+        "VNP46A4"
+      ]
+    },
+    "time_zone": "All NASA products use UTC",
+    "compositing_note": "MODIS uses maximum NDVI composite within window — clouds are suppressed but phenology may be biased",
+    "alignment_code": "ds.resample(time='1D').mean()  # or pd.merge_asof() for irregular timestamps"
+  },
+  "ml_patterns": {
+    "cloud_masking": {
+      "MODIS": "Use StateQA or QA_60 bit flags; bits 0-1 for cloud state",
+      "HLS_Sentinel2": "QA band bits 1-3 for cloud/shadow/snow",
+      "GPM": "precipitationQualityIndex > 0.9 recommended",
+      "VIIRS": "QF_Cloud bit in quality flags"
+    },
+    "normalization": {
+      "NDVI": "Already -1 to 1; no scaling needed",
+      "LST_MODIS": "scale_factor=0.02, subtract 273.15 for Celsius",
+      "reflectance_MODIS": "multiply by 0.0001",
+      "reflectance_HLS": "multiply by 0.0001"
+    },
+    "leakage_prevention": {
+      "spatial": "Use geographically separated folds (k-fold on grid tiles, not random pixels)",
+      "temporal": "Always train on past, validate/test on future dates"
+    },
+    "feature_stack_example": "# Pattern: build labeled dataset from 2+ collections\n# Example: Wildfire risk = NDVI + Precip + Fire labels\nbbox = (-125, 32, -114, 42)  # California\ndates = (\"2020-06-01\", \"2020-09-30\")\n# 1. Fetch each product, resample to common 500m/8-day grid\n# 2. Stack as xarray.Dataset with aligned coordinates\n# 3. Apply QA masks before training"
+  },
+  "categories": [
+    {
+      "id": "cat_01_land_vegetation",
+      "topic": "Land Surface",
+      "label": "Land Cover / Vegetation / NDVI / Crops",
+      "collections": [
+        {
+          "concept_id": "C2327962326-LPCLOUD",
+          "short_name": "MOD13A3",
+          "version": "061",
+          "title": "MODIS/Terra Vegetation Indices Monthly L3 Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MOD13A3.061",
+          "description": "The Terra Moderate Resolution Imaging Spectroradiometer (MODIS) Vegetation Indices Monthly (MOD13A3) Version 6.1 data are provided monthly at 1 kilometer (km) spatial resolution as a gridded Level 3 product in the sinusoidal projection. In generating this monthly product, the algorithm ingests al...",
+          "ml_use": "Monthly NDVI/EVI for crop-type mapping, vegetation health monitoring, drought indices",
+          "variables": [
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER",
+            "PROCESSVERSION",
+            "TileID",
+            "NDVI1KMMONTHQCLASSPERCENTAGE",
+            "EVI1KMMONTHQCLASSPERCENTAGE",
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2000-02-01",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "8.6 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://appeears.earthdatacloud.nasa.gov/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/images/layers/previews/geographic/MODIS_Terra_L3_EVI_Monthly.jpg"
+          },
+          "granule_count": 93611,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MOD13A3\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Monthly composites only — no sub-monthly temporal info",
+            "MODIS tile system (sinusoidal); reproject before analysis"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2565788905-LPCLOUD",
+          "short_name": "MOD13A2",
+          "version": "061",
+          "title": "MODIS/Terra Vegetation Indices 16-Day L3 Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MOD13A2.061",
+          "description": "The MOD13A2 Version 6.1 product provides Vegetation Index (VI) values at a per pixel basis at 1 kilometer (km) spatial resolution. There are two primary vegetation layers. The first is the Normalized Difference Vegetation Index (NDVI), which is referred to as the continuity index to the existing ...",
+          "ml_use": "16-day NDVI time series for phenology, land cover change detection",
+          "variables": [
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER",
+            "PROCESSVERSION",
+            "TileID",
+            "INPUTPRODUCTRESOLUTION",
+            "NDVI1KM16DAYQCLASSPERCENTAGE",
+            "EVI1KM16DAYQCLASSPERCENTAGE",
+            "identifier_product_doi"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2000-02-18",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "8.7 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2565788905-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 178652,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MOD13A2\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "16-day composite; actual acquisition date varies within window",
+            "Max-NDVI compositing suppresses clouds but can bias phenology"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1748066515-LPCLOUD",
+          "short_name": "MOD13Q1",
+          "version": "061",
+          "title": "MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MOD13Q1.061",
+          "description": "The Terra Moderate Resolution Imaging Spectroradiometer (MODIS) Vegetation Indices (MOD13Q1) Version 6.1 data are generated every 16 days at 250 meter (m) spatial resolution as a Level 3 product. The MOD13Q1 product provides two primary vegetation layers. The first is the Normalized Difference Ve...",
+          "ml_use": "16-day 250m NDVI for high-resolution crop mapping and vegetation analysis",
+          "variables": [
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER",
+            "PROCESSVERSION",
+            "TileID",
+            "INPUTPRODUCTRESOLUTION",
+            "NDVI250M16DAYQCLASSPERCENTAGE",
+            "EVI250M16DAYQCLASSPERCENTAGE",
+            "identifier_product_doi"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2000-02-18",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "92.6 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C1748066515-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/images/layers/previews/geographic/MODIS_Terra_L3_EVI_16Day.jpg"
+          },
+          "granule_count": 178658,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MOD13Q1\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "250m resolution; EVI may saturate in dense tropical forest"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2519127224-LPCLOUD",
+          "short_name": "VNP13A1",
+          "version": "002",
+          "title": "VIIRS/NPP Vegetation Indices 16-Day L3 Global 500m SIN Grid V002",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/VIIRS/VNP13A1.002",
+          "description": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [ceased on November 2, 2026 (2026/306)](https://www.earthdata.nasa.gov/data/alerts-outages/reminder-new-suomi-npp-observations-cease-november-2-2026). Data users are encouraged to transition to t...",
+          "ml_use": "VIIRS NDVI/EVI complement to MODIS for continuity in vegetation monitoring",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority",
+            "TileID",
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2012-01-17",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS5",
+          "typical_file_size_mb": "42.8 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2519127224-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 193117,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"VNP13A1\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "VIIRS 500m — slightly different spectral bands than MODIS; not fully interchangeable"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2021957657-LPCLOUD",
+          "short_name": "HLSL30",
+          "version": "2.0",
+          "title": "HLS Landsat Operational Land Imager Surface Reflectance and TOA Brightness Daily Global 30m v2.0",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/HLS/HLSL30.002",
+          "description": "The Harmonized Landsat Sentinel-2 (HLS) project provides consistent surface reflectance (SR) and top of atmosphere (TOA) brightness data from a virtual constellation of satellite sensors. The Operational Land Imager (OLI) is housed aboard the joint NASA/USGS Landsat 8 and Landsat 9 satellites, wh...",
+          "ml_use": "30m Landsat-based surface reflectance for crop mapping, change detection, ML training labels",
+          "variables": [
+            "LANDSAT_PRODUCT_ID",
+            "CLOUD_COVERAGE",
+            "SPATIAL_COVERAGE",
+            "SPATIAL_RESOLUTION",
+            "HORIZONTAL_CS_NAME",
+            "ULX",
+            "ULY",
+            "NCOLS"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2013-04-11",
+          "time_end": "ongoing",
+          "file_format": "COG",
+          "typical_file_size_mb": "20 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2021957657-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/images/layers/previews/geographic/HLS_L30_Nadir_BRDF_Adjusted_Reflectance.jpg"
+          },
+          "granule_count": 16241212,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"HLSL30\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Landsat revisit ~16 days; cloud gaps common; check Fmask QA band bits 1-4",
+            "30m res requires significant storage; use spatial subsets"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2021957295-LPCLOUD",
+          "short_name": "HLSS30",
+          "version": "2.0",
+          "title": "HLS Sentinel-2 Multi-spectral Instrument Surface Reflectance Daily Global 30m v2.0",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/HLS/HLSS30.002",
+          "description": "The Harmonized Landsat Sentinel-2 (HLS) project provides consistent surface reflectance data from the Operational Land Imager (OLI) aboard the joint NASA/USGS Landsat 8 satellite and the Multi-Spectral Instrument (MSI) aboard Europe’s Copernicus Sentinel-2A, Sentinel-2B, and Sentinel-2C satellite...",
+          "ml_use": "30m Sentinel-2-based surface reflectance for crop mapping at high spatial resolution",
+          "variables": [
+            "CLOUD_COVERAGE",
+            "MGRS_TILE_ID",
+            "SPATIAL_COVERAGE",
+            "SPATIAL_RESOLUTION",
+            "HORIZONTAL_CS_CODE",
+            "HORIZONTAL_CS_NAME",
+            "ULX",
+            "ULY"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2015-11-28",
+          "time_end": "ongoing",
+          "file_format": "COG",
+          "typical_file_size_mb": "20 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2021957295-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/images/layers/previews/geographic/HLS_S30_Nadir_BRDF_Adjusted_Reflectance.jpg"
+          },
+          "granule_count": 22280081,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"HLSS30\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Sentinel-2 MSI; band numbering differs from Landsat — check band mapping docs",
+            "10-day revisit but cloud contamination still common"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2484079608-LPCLOUD",
+          "short_name": "MCD12Q1",
+          "version": "061",
+          "title": "MODIS/Terra+Aqua Land Cover Type Yearly L3 Global 500m SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MCD12Q1.061",
+          "description": "The Terra and Aqua combined Moderate Resolution Imaging Spectroradiometer (MODIS) Land Cover Type (MCD12Q1) Version 6.1 data product provides global land cover types at yearly intervals. The MCD12Q1 Version 6.1 data product is derived using supervised classifications of MODIS Terra and Aqua refle...",
+          "ml_use": "Annual land cover classification labels for supervised ML and accuracy assessment",
+          "variables": [
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER",
+            "TileID",
+            "PROCESSVERSION",
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2001-01-01",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "4.6 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2484079608-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/images/layers/previews/geographic/MODIS_Combined_L3_IGBP_Land_Cover_Type_Annual.jpg"
+          },
+          "granule_count": 7875,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MCD12Q1\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Annual only — no within-year dynamics",
+            "IGBP scheme has 17 classes; some regimes lump crops with mosaics"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2565794049-LPCLOUD",
+          "short_name": "MYD13A2",
+          "version": "061",
+          "title": "MODIS/Aqua Vegetation Indices 16-Day L3 Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MYD13A2.061",
+          "description": "The Aqua Moderate Resolution Imaging Spectroradiometer (MODIS) Vegetation Indices 16-Day (MYD13A2) Version 6.1 product provides Vegetation Index (VI) values at a per pixel basis at 1 kilometer (km) spatial resolution. There are two primary vegetation layers. The first is the Normalized Difference...",
+          "ml_use": "Aqua MODIS 16-day NDVI, complementary to Terra (MOD13A2) for gap-filling",
+          "variables": [
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER",
+            "PROCESSVERSION",
+            "TileID",
+            "INPUTPRODUCTRESOLUTION",
+            "NDVI1KM16DAYQCLASSPERCENTAGE",
+            "EVI1KM16DAYQCLASSPERCENTAGE",
+            "identifier_product_doi"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2002-07-04",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "8.8 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2565794049-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 162933,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MYD13A2\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Aqua crosses equator at ~1:30 PM local — different view angle than Terra"
+          ],
+          "tested": true
+        }
+      ]
+    },
+    {
+      "id": "cat_02_active_fires",
+      "topic": "Fire & Burned Area",
+      "label": "Active Fires / Burned Area / Wildfire Risk",
+      "collections": [
+        {
+          "concept_id": "C2565791018-LPCLOUD",
+          "short_name": "MOD14A2",
+          "version": "061",
+          "title": "MODIS/Terra Thermal Anomalies/Fire 8-Day L3 Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MOD14A2.061",
+          "description": "The Terra Moderate Resolution Imaging Spectroradiometer (MODIS) Thermal Anomalies and Fire 8-Day (MOD14A2) Version 6.1 data are generated at 1 kilometer (km) spatial resolution as a Level 3 product. The MOD14A2 gridded composite contains the maximum value of the individual fire pixel classes dete...",
+          "ml_use": "Fire hotspot detection labels for wildfire risk models; temporal fire tracking",
+          "variables": [
+            "FIREPIXELS",
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER",
+            "NUMBERGRIDCELLSCONTAININGFIRE",
+            "PROCESSVERSION",
+            "TileID",
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2000-02-18",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "0.3 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2565791018-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 360813,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MOD14A2\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "8-day composite; individual fire timing lost",
+            "Commission errors possible in hot desert/industrial areas"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2565786756-LPCLOUD",
+          "short_name": "MCD64A1",
+          "version": "061",
+          "title": "MODIS/Terra+Aqua Direct Broadcast Burned Area Monthly L3 Global 500m SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MCD64A1.061",
+          "description": "The Terra and Aqua combined MCD64A1 Version 6.1 Burned Area data product is a monthly, global gridded 500 meter (m) product containing per-pixel burned-area and quality information. The MCD64A1 burned-area mapping approach employs 500 m Moderate Resolution Imaging Spectroradiometer (MODIS) Surfac...",
+          "ml_use": "Monthly burned area ground truth for fire severity classification and risk mapping",
+          "variables": [
+            "PROCESSVERSION",
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER",
+            "TileID",
+            "INPUTFILERESOLUTION",
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2000-11-01",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "1.8 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2565786756-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 83336,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MCD64A1\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Monthly burned area; misses small fires <100ha",
+            "Algorithm differs from active fire — use both for training"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2847928673-LPCLOUD",
+          "short_name": "VNP64A1",
+          "version": "002",
+          "title": "VIIRS/NPP Burned Area Monthly L4 Global 500m SIN Grid V002",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/VIIRS/VNP64A1.002",
+          "description": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [ceased on November 2, 2026 (2026/306)](https://www.earthdata.nasa.gov/data/alerts-outages/reminder-new-suomi-npp-observations-cease-november-2-2026).\n\nThe daily NASA/NOAA Suomi National Polar-or...",
+          "ml_use": "VIIRS burned area monthly for fire ML continuity beyond MODIS era",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority",
+            "TileID",
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2012-03-01",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS5",
+          "typical_file_size_mb": "1.8 MB",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2847928673-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 50050,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"VNP64A1\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "VIIRS successor to MCD64A1; slightly different detection characteristics"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2105705664-LANCEMODIS",
+          "short_name": "MCD14DL",
+          "version": "6.1NRT",
+          "title": "MODIS/Aqua Terra Thermal Anomalies/Fire locations 1km FIRMS NRT (Vector data)",
+          "provider": "LANCEMODIS",
+          "doi": "10.5067/FIRMS/MODIS/MCD14DL.NRT.0061",
+          "description": "The MODIS/Aqua Terra Thermal Anomalies/Fire locations 1km FIRMS Near Real-Time (NRT) - Collection 61 processed by NASA's Land, Atmosphere Near real-time Capability for EOS (LANCE) Fire Information for Resource Management System (FIRMS), using swath products (MOD14/MYD14) rather than the tiled MOD...",
+          "ml_use": "Near-real-time active fire locations for fire response and event detection",
+          "variables": [
+            "Latitude",
+            "Longitude",
+            "Brightness",
+            "Scan",
+            "Track",
+            "Acq_Date",
+            "Acq_Time",
+            "Satellite"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-80 N80",
+          "time_start": "2019-12-15",
+          "time_end": "ongoing",
+          "file_format": "Text File",
+          "typical_file_size_mb": "1 MB",
+          "processing_level": "2",
+          "cloud_hosted": false,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://firms.modaps.eosdis.nasa.gov/active_fire/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 7,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MCD14DL\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "NRT product — preliminary quality; not for long-term climatology",
+            "CSV/shapefile format, not gridded"
+          ],
+          "tested": true
+        }
+      ]
+    },
+    {
+      "id": "cat_03_precipitation",
+      "topic": "Hydrology",
+      "label": "Precipitation / Floods / Drought / Soil Moisture",
+      "collections": [
+        {
+          "concept_id": "C2723754864-GES_DISC",
+          "short_name": "GPM_3IMERGDF",
+          "version": "07",
+          "title": "GPM IMERG Final Precipitation L3 1 day 0.1 degree x 0.1 degree V07 (GPM_3IMERGDF)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/GPM/IMERGDF/DAY/07",
+          "description": "\nVersion 07 is the current version of the data set. Older versions will no longer be available and have been superseded by Version 07.\n\nThe Integrated Multi-satellitE Retrievals for GPM (IMERG) IMERG is a NASA product estimating global surface precipitation rates at a high resolution of 0.1° ever...",
+          "ml_use": "Daily precipitation feature for flood prediction, drought index, crop water stress models",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "1998-01-01",
+          "time_end": "2025-09-30",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C2723754864-GES_DISC/temporal",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 10135,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"GPM_3IMERGDF\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Late-run product has ~2.5 month latency; Early-run available sooner with less accuracy",
+            "Gauge-corrected; sparse gauge network affects quality over oceans and remote land"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2723754847-GES_DISC",
+          "short_name": "GPM_3IMERGHH",
+          "version": "07",
+          "title": "GPM IMERG Final Precipitation L3 Half Hourly 0.1 degree x 0.1 degree V07 (GPM_3IMERGHH)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/GPM/IMERG/3B-HH/07",
+          "description": "Version 07B is the current version of the IMERG data sets. Older versions will no longer be available and have been superseded by Version 07.\n\nThe Integrated Multi-satellitE Retrievals for GPM (IMERG) is the unified U.S. algorithm that provides the multi-satellite precipitation product for the U....",
+          "ml_use": "30-min precipitation for flash flood ML, storm tracking, sub-daily hydrological models",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "1998-01-01",
+          "time_end": "2025-09-30",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C2723754847-GES_DISC/temporal",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/?z=4&ics=true&ici=5&icd=30&l=Reference_Labels_15m(hidden),Reference_Features_15m(hidden),Coastlines_15m,IMERG_Precipitation_Rate,IMERG_Precipitation_Rate_30min,OCI_PACE_True_Color(hidden),VIIRS_NOAA21_CorrectedReflectance_TrueColor(hidden),VIIRS_NOAA20_CorrectedReflectance_TrueColor(hidden),VIIRS_SNPP_CorrectedReflectance_TrueColor(hidden),MODIS_Aqua_CorrectedReflectance_TrueColor(hidden),MODIS_Terra_CorrectedReflectance_TrueColor&lg=true&t=2026-03-16-T17%3A17%3A59Z"
+          },
+          "granule_count": 486480,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"GPM_3IMERGHH\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Very large dataset; use temporal/spatial subsets",
+            "0.1° resolution; 30-min accumulation"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2938664585-NSIDC_CPRD",
+          "short_name": "SPL3SMP",
+          "version": "009",
+          "title": "SMAP L3 Radiometer Global Daily 36 km EASE-Grid Soil Moisture V009",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/4XXOGX0OOW1S",
+          "description": "This Level-3 (L3) soil moisture product provides a composite of daily estimates of global land surface conditions retrieved by the Soil Moisture Active Passive (SMAP) passive microwave radiometer. SMAP L-band soil moisture data are resampled to a global, cylindrical 36 km Equal-Area Scalable Eart...",
+          "ml_use": "Soil moisture input for drought monitoring, agricultural stress prediction, flood risk",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180.0 E180.0 S-85.044 N85.044",
+          "time_start": "2015-03-31",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2938664585-NSIDC_CPRD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/?v=-193,-69,134,83&l=SMAP_L3_Passive_Brightness_Temp_V,SMAP_L3_Passive_Day_Soil_Moisture,SMAP_L3_Passive_Night_Soil_Moisture,SMAP_L3_Passive_Brightness_Temp_H,Coastlines_15m,MODIS_Terra_CorrectedReflectance_TrueColor&t=2015-03-31"
+          },
+          "granule_count": 4166,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"SPL3SMP\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Enhanced 9km product (not standard 36km) — fewer data gaps",
+            "Radiometer can't penetrate dense vegetation canopy (>5 kg/m²)"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3480440870-NSIDC_CPRD",
+          "short_name": "SPL4SMGP",
+          "version": "008",
+          "title": "SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Geophysical Data V008",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/T5RUATAQREF8",
+          "description": "SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products. \n\nThe SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Geophysical Data (SPL4SMGP, DOI: 10.5067/T5RUATAQREF8) product is a series of 3-hourly time average geophysical land ...",
+          "ml_use": "SMAP L4 3-hourly soil moisture profile for root-zone water availability, agricultural stress prediction",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180.0 E180.0 S-85.044 N85.044",
+          "time_start": "2015-03-31",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3480440870-NSIDC_CPRD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/?v=-203.53279034494884,2.987241956863528,1.560533905732342,102.54974195686353&l=SMAP_L4_Snow_Mass,Coastlines_15m,MODIS_Terra_CorrectedReflectance_TrueColor&lg=true&t=2025-09-03-T19%3A07%3A19Z"
+          },
+          "granule_count": 33977,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"SPL4SMGP\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Model-assimilated product — not independent observations; correlated with GEOS-5",
+            "9km EASE-Grid — reproject for integration with optical data"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3195527175-POCLOUD",
+          "short_name": "TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4",
+          "version": "RL06.3Mv04",
+          "title": "JPL GRACE and GRACE-FO Mascon Ocean, Ice, and Hydrology Equivalent Water Height Coastal Resolution Improvement (CRI) Filtered Release 06.3 Version 04",
+          "provider": "POCLOUD",
+          "doi": "10.5067/TEMSC-3JC634",
+          "description": "This dataset contains gridded monthly global water storage/height anomalies relative to a time-mean, derived from GRACE and GRACE-FO and processed at JPL using the Mascon approach (RL06.3Mv04). A Coastal Resolution Improvement (CRI) filter has been applied to this data set to reduce signal leakag...",
+          "ml_use": "GRACE/GRACE-FO terrestrial water storage anomaly for drought/flood severity and groundwater depletion ML",
+          "variables": [
+            "earliest_granule_start_time",
+            "latest_granule_end_time",
+            "data_latency",
+            "Series Name",
+            "Persistent ID"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2002-04-04",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C3195527175-POCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://opendap.earthdata.nasa.gov",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 1,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Monthly resolution only; gap months in 2017-2018 GRACE/GRACE-FO transition",
+            "Mascon approach; apply land mask and CRI filter for land-only analysis"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3193285193-POCLOUD",
+          "short_name": "TELLUS_GRFO_L3_CSR_RL06.3_LND_v04",
+          "version": "RL06.3v04",
+          "title": "CSR TELLUS GRACE-FO Level-3 Monthly Land Water-Equivalent-Thickness Surface Mass Anomaly Release 6.3 version 04",
+          "provider": "POCLOUD",
+          "doi": "10.5067/GFLND-3C634",
+          "description": "This data set is produced by the Center for Space Research (CSR) GRACE-FO (Gravity Recovery and Climate Experiment Follow-On) program and derives the terrestrial water storage anomaly given as equivalent water thickness. These monthly grids are derived from GRACE-FO time-variable gravity observat...",
+          "ml_use": "GRACE-FO land water equivalent thickness for long-term water cycle trend analysis",
+          "variables": [
+            "earliest_granule_start_time",
+            "latest_granule_end_time",
+            "Series Name"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-89.5 N89.5",
+          "time_start": "2018-05-22",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C3193285193-POCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://opendap.earthdata.nasa.gov",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 97,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"TELLUS_GRFO_L3_CSR_RL06.3_LND_v04\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Spherical harmonics; apply de-striping and Gaussian smoothing (300km recommended)",
+            "Independent from mascon solution — compare both for uncertainty quantification"
+          ],
+          "tested": true
+        }
+      ]
+    },
+    {
+      "id": "cat_04_temperature",
+      "topic": "Temperature & Climate",
+      "label": "Temperature / Land Surface / Climate Reanalysis",
+      "collections": [
+        {
+          "concept_id": "C1276812863-GES_DISC",
+          "short_name": "M2T1NXSLV",
+          "version": "5.12.4",
+          "title": "MERRA-2 tavg1_2d_slv_Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Single-Level Diagnostics 0.625 x 0.5 degree V5.12.4 (M2T1NXSLV)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/VJAFPLI1CSIV",
+          "description": "M2T1NXSLV (or  tavg1_2d_slv_Nx) is an hourly time-averaged 2-dimensional data collection in Modern-Era Retrospective analysis for Research and Applications version 2 (MERRA-2).  This collection consists of meteorology diagnostics at popularly used vertical levels, such as air temperature at 2-met...",
+          "ml_use": "MERRA-2 hourly 2m air temperature, humidity, winds for climate ML and weather downscaling",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "1980-01-01",
+          "time_end": "ongoing",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2T1NXSLV.5.12.4/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 17076,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"M2T1NXSLV\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Very large dataset; hourly global 0.5°×0.625° — subset spatially/temporally",
+            "Reanalysis: not direct observations; regional biases exist especially over sparse-station areas"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1276812843-GES_DISC",
+          "short_name": "M2SDNXSLV",
+          "version": "5.12.4",
+          "title": "MERRA-2 statD_2d_slv_Nx: 2d,Daily,Aggregated Statistics,Single-Level,Assimilation,Single-Level Diagnostics 0.625 x 0.5 degree V5.12.4 (M2SDNXSLV)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/9SC1VNTWGWV3",
+          "description": "M2SDNXSLV (or  statD_2d_slv_Nx) is a 2-dimensional daily data collection in Modern-Era Retrospective analysis for Research and Applications version 2 (MERRA-2).  This collection consists of daily statistics, such as daily mean (or daily minimum and maximum) air temperature at 2-meter, and maximum...",
+          "ml_use": "MERRA-2 daily statistics for extreme event detection, heat wave classification, climate trend analysis",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "1980-01-01",
+          "time_end": "ongoing",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2SDNXSLV.5.12.4/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 17076,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"M2SDNXSLV\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Daily statistics product; min/max/mean aggregated — verify which statistic before ML feature engineering"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1342986035-GES_DISC",
+          "short_name": "GLDAS_NOAH025_3H",
+          "version": "2.1",
+          "title": "GLDAS Noah Land Surface Model L4 3 hourly 0.25 x 0.25 degree V2.1 (GLDAS_NOAH025_3H)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/E7TYRXPJKWOQ",
+          "description": "NASA Global Land Data Assimilation System Version 2 (GLDAS-2) has three components: GLDAS-2.0, GLDAS-2.1, and GLDAS-2.2.  GLDAS-2.0 is forced entirely with the Princeton meteorological forcing input data and provides a temporally consistent series from 1948 through 2014.  GLDAS-2.1 is forced with...",
+          "ml_use": "GLDAS 3-hourly land surface model outputs for hydrological ML and soil/vegetation state estimation",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-60 N90",
+          "time_start": "2000-01-01",
+          "time_end": "ongoing",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1342986035-GES_DISC",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 77671,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"GLDAS_NOAH025_3H\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Model output, not observations — use ensemble spread for uncertainty",
+            "0.25° resolution; discontinuities at MODIS forcing transitions"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1342986036-GES_DISC",
+          "short_name": "GLDAS_NOAH025_M",
+          "version": "2.1",
+          "title": "GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.1 (GLDAS_NOAH025_M)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/SXAVCZFAQLNO",
+          "description": "NASA Global Land Data Assimilation System Version 2 (GLDAS-2) has three components: GLDAS-2.0, GLDAS-2.1, and GLDAS-2.2.  GLDAS-2.0 is forced entirely with the Princeton meteorological forcing input data and provides a temporally consistent series from 1948 through 2014.  GLDAS-2.1 is forced with...",
+          "ml_use": "GLDAS monthly mean land surface variables for climate analysis and long-term trend detection",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-60 N90",
+          "time_start": "2000-01-01",
+          "time_end": "ongoing",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1342986036-GES_DISC",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/?l=Reference_Labels_15m(hidden),Reference_Features_15m(hidden),Coastlines_15m,GLDAS_Near_Surface_Air_Temperature_Monthly,GLDAS_Surface_Total_Precipitation_Rate_Monthly,GLDAS_Underground_Soil_Moisture_Monthly,OCI_PACE_True_Color(hidden),VIIRS_NOAA21_CorrectedReflectance_TrueColor(hidden),VIIRS_NOAA20_CorrectedReflectance_TrueColor(hidden),VIIRS_SNPP_CorrectedReflectance_TrueColor(hidden),MODIS_Aqua_CorrectedReflectance_TrueColor(hidden),MODIS_Terra_CorrectedReflectance_TrueColor&lg=true&t=2026-03-17-T12%3A21%3A36Z"
+          },
+          "granule_count": 319,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"GLDAS_NOAH025_M\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Monthly only; use for climatological baselines rather than event detection"
+          ],
+          "tested": true
+        }
+      ]
+    },
+    {
+      "id": "cat_05_air_quality",
+      "topic": "Atmosphere",
+      "label": "Air Quality / Aerosols / Atmospheric Composition",
+      "collections": [
+        {
+          "concept_id": "C3333493715-GES_DISC",
+          "short_name": "OMNO2d",
+          "version": "004",
+          "title": "OMI/Aura NO2 Cloud-Screened Total and Tropospheric Column L3 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2d)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/AURA/OMI/DATA3407",
+          "description": "This is Level-3 daily global gridded (0.25x0.25 degree) Nitrogen Dioxide Product (OMNO2d). OMNO2d data product is a Level-3 Gridded Product where pixel level data of good quality are binned and \"averaged\" into 0.25x0.25 degree global grids. This product contains Total column NO2 and Total Troposp...",
+          "ml_use": "Daily NO2 columns for air quality ML, pollution source attribution, urban health studies",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2004-10-01",
+          "time_end": "ongoing",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C3333493715-GES_DISC",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 8029,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"OMNO2d\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Daily gridded at 0.25°; cloud fraction threshold needed (apply cloud_fraction < 0.3)",
+            "Retrieval quality degrades at high SZA (polar winter); use qa_value >= 0.75"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1266136113-GES_DISC",
+          "short_name": "OMSO2G",
+          "version": "003",
+          "title": "OMI/Aura Sulphur Dioxide (SO2) Total Column Daily L2 Global Gridded 0.125 degree x 0.125 degree V3 (OMSO2G)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/Aura/OMI/DATA2023",
+          "description": "This Level-2G daily global gridded product OMSO2G is based on the pixel level OMI Level-2 SO2 product OMSO2.  OMSO2G data product is a special Level-2 gridded product where pixel level products are binned into 0.125x0.125 degree global grids. It contains the data for all scenes that have observat...",
+          "ml_use": "Daily SO2 for volcanic eruption detection, industrial pollution monitoring, atmospheric chemistry ML",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2004-10-01",
+          "time_end": "ongoing",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "2G",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://acdisc.gsfc.nasa.gov/data/Aura_OMI_Level2G/OMSO2G.003/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 7518,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"OMSO2G\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "SO2 retrieval has large uncertainty over clean ocean; mask low-signal pixels",
+            "Multiple SO2 columns (PBL, TRL, TRM, STL) — choose appropriate altitude layer"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1443420430-LAADS",
+          "short_name": "MOD04_3K",
+          "version": "6.1",
+          "title": "MODIS/Terra Aerosol 5-Min L2 Swath 3km",
+          "provider": "LAADS",
+          "doi": "10.5067/MODIS/MOD04_3K.061",
+          "description": "The new Collection 6.1 (C61) MODIS/Terra Aerosol 5 Min L2 Swath 3km (MOD04_3K) product is an improved version based on algorithm changes in Dark Target (DT) Aerosol retrieval over urban areas and uncertainty estimates for Deep Blue (DB) Aerosol retrievals.\n\nThe MODIS level-2 atmospheric aerosol p...",
+          "ml_use": "3km MODIS aerosol optical depth for air quality, PM2.5 estimation, climate forcing ML",
+          "variables": [
+            "SuccessfulRetrievalPct_Ocean",
+            "SuccessfulRetrievalPct",
+            "SuccessfulRetrievalPct_Land",
+            "SCI_STATE",
+            "SCI_ABNORM",
+            "VeryHighConfidentClearPct",
+            "LowConfidentClearPct",
+            "HighConfidentClearPct"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2000-02-24",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS",
+          "typical_file_size_mb": "8 MB",
+          "processing_level": "2",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD04_3K--61",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://ladsweb.modaps.eosdis.nasa.gov/opendap/RemoteResources/laads/allData/61/MOD04_3K/contents.html",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 1491495,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MOD04_3K\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Land and ocean retrievals use different algorithms; check Land_Ocean_Quality_Flag",
+            "High cloud contamination risk; check quality flag before ML ingestion"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1443528505-LAADS",
+          "short_name": "MYD04_3K",
+          "version": "6.1",
+          "title": "MODIS/Aqua Aerosol 5-Min L2 Swath 3km",
+          "provider": "LAADS",
+          "doi": "10.5067/MODIS/MYD04_3K.061",
+          "description": "The new Collection 6.1 (C61) MODIS/Aqua Aerosol 5 Min L2 Swath 3km (MYD04_3K) product is an improved version based on algorithm changes in Dark Target (DT) Aerosol retrieval over urban areas and uncertainty estimates for Deep Blue (DB) Aerosol retrievals.\n\nThe MODIS level-2 atmospheric aerosol pr...",
+          "ml_use": "Aqua MODIS 3km AOD — complementary to Terra (MOD04_3K) for twice-daily coverage",
+          "variables": [
+            "SuccessCloudPhaseRtrPct_IR",
+            "SuccessCloudOptPropRtrPct_VIS",
+            "IceCloudDetectedPct_VIS",
+            "CloudCoverFractionPct_VIS",
+            "SuccessfulRetrievalPct_NIR",
+            "SuccessfulRetrievalPct_IR",
+            "SuccessfulRetrievalPct_Ocean",
+            "SuccessfulRetrievalPct_Land"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2002-07-04",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS",
+          "typical_file_size_mb": "8 MB",
+          "processing_level": "2",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MYD04_3K--61",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://ladsweb.modaps.eosdis.nasa.gov/opendap/RemoteResources/laads/allData/61/MYD04_3K/contents.html",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 1374685,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MYD04_3K\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Same caveats as MOD04_3K but Aqua equatorial crossing ~1:30pm vs Terra ~10:30am"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1276812830-GES_DISC",
+          "short_name": "M2T1NXAER",
+          "version": "5.12.4",
+          "title": "MERRA-2 tavg1_2d_aer_Nx: 2d,1-Hourly,Time-averaged,Single-Level,Assimilation,Aerosol Diagnostics 0.625 x 0.5 degree V5.12.4 (M2T1NXAER)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/KLICLTZ8EM9D",
+          "description": "M2T1NXAER (or  tavg1_2d_aer_Nx) is an hourly time-averaged 2-dimensional data collection in Modern-Era Retrospective analysis for Research and Applications version 2 (MERRA-2).  This collection consists of assimilated aerosol diagnostics, such as column mass density of aerosol components (black c...",
+          "ml_use": "MERRA-2 hourly aerosol diagnostics (AOD, dust, sea salt) for air quality trend ML",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "1980-01-01",
+          "time_end": "ongoing",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2T1NXAER.5.12.4/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 17076,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"M2T1NXAER\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Reanalysis-based aerosol; model biases in emissions propagate to output",
+            "0.5°×0.625° grid; insufficient for urban-scale studies"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2089270961-GES_DISC",
+          "short_name": "S5P_L2__NO2____HiR",
+          "version": "2",
+          "title": "Sentinel-5P TROPOMI Tropospheric NO2 1-Orbit L2 5.5km x 3.5km V2 (S5P_L2__NO2____HiR)",
+          "provider": "GES_DISC",
+          "doi": "10.5270/S5P-9bnp8q8",
+          "description": "Starting from August 6th in 2019, Sentinel-5P TROPOMI along-track high spatial resolution (~5.5km at nadir) has been implemented.\nFor data before August 6th of 2019, please check S5P_L2__NO2____1 data collection.\n\nThe Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one o...",
+          "ml_use": "TROPOMI high-resolution (3.5×5.5km) tropospheric NO2 columns for urban air quality ML",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2018-04-30",
+          "time_end": "ongoing",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "2",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C2089270961-GES_DISC",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/?l=Reference_Labels_15m(hidden),Reference_Features_15m(hidden),Coastlines_15m,TROPOMI_L2_Nitrogen_Dioxide_Tropospheric_Column,TROPOMI_L2_Sulfur_Dioxide_Total_Vertical_Column,AIRS_L3_Carbon_Monoxide_500hPa_Volume_Mixing_Ratio_Daily_Day,OCI_PACE_True_Color(hidden),VIIRS_NOAA21_CorrectedReflectance_TrueColor(hidden),VIIRS_NOAA20_CorrectedReflectance_TrueColor(hidden),VIIRS_SNPP_CorrectedReflectance_TrueColor(hidden),MODIS_Aqua_CorrectedReflectance_TrueColor(hidden),MODIS_Terra_CorrectedReflectance_TrueColor&lg=true&t=2026-02-25-T18%3A24%3A48Z"
+          },
+          "granule_count": 43971,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"S5P_L2__NO2____HiR\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Swath data — requires spatial binning to grid for ML feature stacks",
+            "Apply qa_value >= 0.75 filter; clouds and snow cause retrieval issues"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2324689816-LPCLOUD",
+          "short_name": "MCD19A2",
+          "version": "061",
+          "title": "MODIS/Terra+Aqua Land Aerosol Optical Depth Daily L2G Global 1km SIN Grid V061",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MODIS/MCD19A2.061",
+          "description": "The MCD19A2 Version 6.1 data product is a Moderate Resolution Imaging Spectroradiometer (MODIS) Terra and Aqua combined Multi-angle Implementation of Atmospheric Correction (MAIAC) Land Aerosol Optical Depth (AOD) gridded Level 2 product produced daily at 1 kilometer (km) pixel resolution. The MC...",
+          "ml_use": "Multi-angle MODIS MAIAC AOD at 1km for air quality, PM2.5 estimation ML",
+          "variables": [
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER",
+            "TileID",
+            "PROCESSVERSION",
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2000-02-24",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "6.7 MB",
+          "processing_level": "2G",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2324689816-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/images/layers/previews/geographic/MODIS_Combined_MAIAC_L2G_AerosolOpticalDepth.jpg"
+          },
+          "granule_count": 2881933,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MCD19A2\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "MAIAC algorithm requires contiguous orbit history — gaps at orbit boundaries",
+            "1km AOD — finer than standard DT/DB retrievals; check urban vs rural retrieval mode"
+          ],
+          "tested": true
+        }
+      ]
+    },
+    {
+      "id": "cat_06_oceans",
+      "topic": "Ocean",
+      "label": "Oceans / Sea Surface Temperature / Ocean Color",
+      "collections": [
+        {
+          "concept_id": "C1996881146-POCLOUD",
+          "short_name": "MUR-JPL-L4-GLOB-v4.1",
+          "version": "4.1",
+          "title": "GHRSST Level 4 MUR Global Foundation Sea Surface Temperature Analysis (v4.1)",
+          "provider": "POCLOUD",
+          "doi": "10.5067/GHGMR-4FJ04",
+          "description": "A Group for High Resolution Sea Surface Temperature (GHRSST) Level 4 sea surface temperature analysis produced as a retrospective dataset (four day latency) and near-real-time dataset (one day latency) at the JPL Physical Oceanography DAAC using wavelets as basis functions in an optimal interpola...",
+          "ml_use": "1km daily gap-free SST for marine heatwave detection, coral bleaching risk, fisheries ML",
+          "variables": [
+            "earliest_granule_start_time",
+            "latest_granule_end_time",
+            "Series Name",
+            "Persistent ID"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2002-05-31",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "700 MB",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C1996881146-POCLOUD ",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://opendap.earthdata.nasa.gov",
+            "harmony": "https://harmony.earthdata.nasa.gov/",
+            "gibs_layer": "https://www.earthdata.nasa.gov/data/tools/worldview"
+          },
+          "granule_count": 8933,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MUR-JPL-L4-GLOB-v4.1\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Very large dataset (1km global daily); always subset spatially",
+            "Foundation SST (not skin SST); compare to MODIS for surface vs subsurface dynamics"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2036880657-POCLOUD",
+          "short_name": "MUR25-JPL-L4-GLOB-v04.2",
+          "version": "4.2",
+          "title": "GHRSST Level 4 MUR 0.25deg Global Foundation Sea Surface Temperature Analysis (v4.2)",
+          "provider": "POCLOUD",
+          "doi": "10.5067/GHM25-4FJ42",
+          "description": "A Group for High Resolution Sea Surface Temperature (GHRSST) Level 4 sea surface temperature analysis produced as a retrospective dataset  at the JPL Physical Oceanography DAAC using wavelets as basis functions in an optimal interpolation approach on a global 0.25 degree grid. The version 4 Multi...",
+          "ml_use": "0.25° daily SST for ENSO/PDO indices, basin-scale climate ML, operational ocean forecasting features",
+          "variables": [
+            "earliest_granule_start_time",
+            "latest_granule_end_time",
+            "data_latency",
+            "Series Name",
+            "Persistent ID"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2002-08-31",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "2 MB",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C2036880657-POCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://opendap.earthdata.nasa.gov",
+            "harmony": "https://harmony.earthdata.nasa.gov/",
+            "gibs_layer": "https://www.earthdata.nasa.gov/data/tools/worldview"
+          },
+          "granule_count": 8841,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MUR25-JPL-L4-GLOB-v04.2\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "0.25° coarser than MUR 1km; use for large-scale climate studies only"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3380709133-OB_CLOUD",
+          "short_name": "MODISA_L3m_CHL",
+          "version": "2022.0",
+          "title": "Aqua MODIS Level-3 Global Mapped Chlorophyll (CHL) Data, version 2022.0",
+          "provider": "OB_CLOUD",
+          "doi": "10.5067/AQUA/MODIS/L3M/CHL/2022.0",
+          "description": "The Chlorophyll-a data suite provides global, gridded composites of surface chlorophyll-a concentration (a proxy for phytoplankton biomass). CHL supports time-series and climatologies, anomaly detection, ecosystem and fisheries applications, and teaching/training, and pairs well with AVW, PAR, Kd...",
+          "ml_use": "Global monthly chlorophyll-a for ocean productivity ML, harmful algal bloom prediction, biogeochemistry",
+          "variables": [
+            "CompositingPeriod",
+            "SpatialResolution",
+            "Product"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2002-07-04",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3380709133-OB_CLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://oceandata.sci.gsfc.nasa.gov/opendap/MODISA/L3SMI/",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 27028,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MODISA_L3m_CHL\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Cloud/ice gaps persist in monthly composites; apply valid data mask (l2_flags)",
+            "Algorithm uncertainty high in coastal/turbid waters; use Rrs-based approaches for nearshore"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3233945000-POCLOUD",
+          "short_name": "SWOT_L2_LR_SSH_D",
+          "version": "D",
+          "title": "SWOT Level 2 KaRIn Low Rate Sea Surface Height Data Product, Version D",
+          "provider": "POCLOUD",
+          "doi": "10.5067/SWOT-SSH-D",
+          "description": "The SWOT Level 2 KaRIn Low Rate Sea Surface Height Data Product from the Surface Water Ocean Topography (SWOT) mission provides global sea surface height and significant wave height observations derived from low rate (LR) measurements from the Ka-band Radar Interferometer (KaRIn). SWOT launched o...",
+          "ml_use": "SWOT wide-swath sea surface height for eddy detection, ocean current ML, inland water levels",
+          "variables": [
+            "TILE"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2022-12-16",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "",
+          "processing_level": "2",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C3233945000-POCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://opendap.earthdata.nasa.gov",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 151431,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"SWOT_L2_LR_SSH_D\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "New mission (2022+); data quality still improving; check science quality flag",
+            "21-day repeat orbit; temporal coverage gaps between swaths"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3380708980-OB_CLOUD",
+          "short_name": "MODISA_L2_OC",
+          "version": "2022.0",
+          "title": "Aqua MODIS Level-2 Regional  Ocean Color (OC) Data, version 2022.0",
+          "provider": "OB_CLOUD",
+          "doi": "10.5067/AQUA/MODIS/L2/OC/2022.0",
+          "description": "The Ocean Color (OC) data suite provides calibrated, atmospherically corrected ocean-optics measurements and derived biogeophysical products. This data suite includes the Apparent Optical Properties (AOP) and provides satellite-derived measures of the interaction between solar radiation and the u...",
+          "ml_use": "MODIS Aqua L2 ocean color Rrs bands for water quality ML, sediment transport, primary productivity",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2002-07-04",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "",
+          "processing_level": "2",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3380708980-OB_CLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 1713208,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MODISA_L2_OC\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Swath data at 1km; requires spatial binning to grid for ML",
+            "High cloud contamination in tropics; temporal compositing needed"
+          ],
+          "tested": true
+        }
+      ]
+    },
+    {
+      "id": "cat_07_cryosphere",
+      "topic": "Cryosphere",
+      "label": "Cryosphere / Snow / Sea Ice / Ice Sheets / Glaciers",
+      "collections": [
+        {
+          "concept_id": "C3050353608-NSIDC_CPRD",
+          "short_name": "MOD10CM",
+          "version": "61",
+          "title": "MODIS/Terra Snow Cover Monthly L3 Global 0.05Deg CMG V061",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/MODIS/MOD10CM.061",
+          "description": "This global Level-3 (L3) data set provides monthly mean snow cover extent within 0.05° (approx. 5 km) MODIS Climate Modeling Grid (CMG) cells. This data set is derived from snow cover observations in the 'MODIS/Terra Snow Cover Daily L3 Global 0.05Deg CMG’ data set (DOI:10.5067/MODIS/MOD10C1.061)...",
+          "ml_use": "Monthly MODIS snow cover for snowmelt runoff prediction, water resource ML, climate trend analysis",
+          "variables": [
+            "PROCESSVERSION",
+            "SNOWCOVERPERCENT",
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180.0 E180.0 S-90.0 N90.0",
+          "time_start": "2000-03-01",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3050353608-NSIDC_CPRD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/?v=-224,-103,170,79&l=MODIS_Terra_L3_Snow_Cover_Monthly_Average_Pct,Coastlines_15m,MODIS_Terra_CorrectedReflectance_TrueColor&t=2000-03-01"
+          },
+          "granule_count": 315,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MOD10CM\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Monthly composited; cloud-free but temporal detail lost",
+            "NDSI threshold may miss wet snow (spring melt)"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3177837864-NSIDC_CPRD",
+          "short_name": "NSIDC-0079",
+          "version": "4",
+          "title": "Bootstrap Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS V004",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/X5LG68MH013O",
+          "description": "This sea ice concentration data set was derived using measurements from the Scanning Multichannel Microwave Radiometer (SMMR) on the Nimbus-7 satellite and from the Special Sensor Microwave/Imager (SSM/I) sensors on the Defense Meteorological Satellite Program's (DMSP) -F8, -F11, and -F13 satelli...",
+          "ml_use": "Daily SSM/I passive microwave sea ice concentration for sea ice extent ML and navigation risk",
+          "variables": [
+            "GridResolution",
+            "SIPSMetGenVersion",
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180.0 E180.0 S30.0 N90.0",
+          "time_start": "1978-11-01",
+          "time_end": "2025-12-31",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3177837864-NSIDC_CPRD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 35580,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"NSIDC-0079\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "25km passive microwave resolution; melt pond contamination in summer reduces accuracy",
+            "SSMI/SSMIS sensor transitions; check inter-sensor calibration before long-term trend analysis"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3177837840-NSIDC_CPRD",
+          "short_name": "NSIDC-0051",
+          "version": "2",
+          "title": "Sea Ice Concentrations from Nimbus-7 SMMR and DMSP SSM/I-SSMIS Passive Microwave Data V002",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/MPYG15WAA4WX",
+          "description": "This data set is generated from brightness temperature data and is designed to provide a consistent time series of sea ice concentrations spanning the coverage of several passive microwave instruments.The data are provided in the polar stereographic projection at a grid cell size of 25 x 25 km.  ...",
+          "ml_use": "SMMR/SSM/I sea ice concentration 25km for long-term cryosphere trend analysis",
+          "variables": [
+            "GridResolution",
+            "SIPSMetGenVersion",
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180.0 E180.0 S-90.0 N-39.23",
+          "time_start": "1978-10-26",
+          "time_end": "2025-12-31",
+          "file_format": "PNG",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3177837840-NSIDC_CPRD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 35600,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"NSIDC-0051\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "25km; may underestimate sea ice in melt season due to surface melt ponds",
+            "Data gaps before 1979 for some channels"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3578753623-NSIDC_CPRD",
+          "short_name": "ATL09",
+          "version": "007",
+          "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics V007",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/ATLAS/ATL09.007",
+          "description": "ATL09 contains calibrated, attenuated backscatter profiles (CAB), layer-integrated attenuated backscatter, blowing snow, and other parameters including cloud and aerosol layer height and atmospheric characteristics. The data were acquired by the Advanced Topographic Laser Altimeter System (ATLAS)...",
+          "ml_use": "ICESat-2 ATL09 atmospheric calibrated backscatter for cloud profiling ML",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180.0 E180.0 S-88.0 N88.0",
+          "time_start": "2018-10-13",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3578753623-NSIDC_CPRD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 42670,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"ATL09\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Along-track profile only — not gridded; requires spatial aggregation for area ML"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3091267534-NSIDC_CPRD",
+          "short_name": "MYD10CM",
+          "version": "61",
+          "title": "MODIS/Aqua Snow Cover Monthly L3 Global 0.05Deg CMG V061",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/MODIS/MYD10CM.061",
+          "description": "This global Level-3 (L3) data set provides monthly average snow cover within 0.05° (approx. 5 km) MODIS Climate Modeling Grid (CMG) cells. Monthly averages are computed from daily snow cover observations in the MODIS/Aqua Snow Cover Daily L3 Global 0.05Deg CMG (https://doi.org/10.5067/MODIS/MYD10...",
+          "ml_use": "Aqua MODIS monthly snow cover CMG for Northern Hemisphere snowpack analysis, climate ML",
+          "variables": [
+            "PROCESSVERSION",
+            "SNOWCOVERPERCENT",
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180.0 E180.0 S-90.0 N90.0",
+          "time_start": "2002-07-04",
+          "time_end": "ongoing",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3091267534-NSIDC_CPRD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/?v=-190,-90,151,68&l=MODIS_Aqua_L3_Snow_Cover_Monthly_Average_Pct,Coastlines_15m,MODIS_Terra_CorrectedReflectance_TrueColor&t=2003-01-01"
+          },
+          "granule_count": 290,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MYD10CM\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Monthly only; pair with MOD10CM (Terra) for double-coverage consistency check",
+            "NDSI-based; wet snow in spring may be missed"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3177837670-NSIDC_CPRD",
+          "short_name": "NISE",
+          "version": "5",
+          "title": "Near-Real-Time SSM/I-SSMIS EASE-Grid Daily Global Ice Concentration and Snow Extent V005",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/3KB2JPLFPK3R",
+          "description": "The Near-real-time Ice and Snow Extent (NISE) data set provides daily, global maps of sea ice concentrations and snow extent. These data are not suitable for time series, anomalies, or trends analyses. They are meant to provide a best estimate of current ice and snow conditions based on informati...",
+          "ml_use": "Near-real-time daily sea ice concentration for operational ice extent tracking and sea ice ML features",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180.0 E180.0 S-90.0 N90.0",
+          "time_start": "2016-12-01",
+          "time_end": "2026-01-16",
+          "file_format": "HDF-EOS2",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3177837670-NSIDC_CPRD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": "https://worldview.earthdata.nasa.gov/?v=-7689170,-3826010,5790597,2418912&p=arctic&l=SSMIS_Sea_Ice_Concentration_Snow_Extent(disabled=3-4-5-6;),Coastlines_15m,MODIS_Terra_CorrectedReflectance_TrueColor"
+          },
+          "granule_count": 3323,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"NISE\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "NRT product; may have preliminary quality; not recommended for long-term climatology",
+            "EASE-Grid projection; reproject to WGS84 for multi-sensor fusion"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3564876127-NSIDC_CPRD",
+          "short_name": "ATL06",
+          "version": "007",
+          "title": "ATLAS/ICESat-2 L3A Land Ice Height V007",
+          "provider": "NSIDC_CPRD",
+          "doi": "10.5067/ATLAS/ATL06.007",
+          "description": "ATL06 contains geolocated land-ice surface heights above the WGS84 ellipsoid, plus ancillary parameters that can be used to interpret and assess the quality of the height estimates. The data were acquired by the Advanced Topographic Laser Altimeter System (ATLAS) instrument on board the ICESat-2 ...",
+          "ml_use": "ICESat-2 land ice surface elevation for ice sheet mass balance ML, glaciological studies",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180.0 E180.0 S-88.0 N88.0",
+          "time_start": "2018-10-14",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3564876127-NSIDC_CPRD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 448704,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"ATL06\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Along-track profile only — not gridded; requires spatial aggregation",
+            "Strong beam vs weak beam quality differences; use only strong beams for elevation retrievals"
+          ],
+          "tested": true
+        }
+      ]
+    },
+    {
+      "id": "cat_08_elevation",
+      "topic": "Terrain",
+      "label": "Elevation / Terrain / 3D Structure",
+      "collections": [
+        {
+          "concept_id": "C2763266360-LPCLOUD",
+          "short_name": "SRTMGL1",
+          "version": "003",
+          "title": "NASA Shuttle Radar Topography Mission Global 1 arc second V003",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MEASURES/SRTM/SRTMGL1.003",
+          "description": "The Land Processes Distributed Active Archive Center (LP DAAC) is responsible for the archive and distribution of the NASA Making Earth System Data Records for Use in Research Environments ([MEaSUREs](https://earthdata.nasa.gov/about/competitive-programs/measures\n)) version SRTM, which includes t...",
+          "ml_use": "30m global DEM for terrain features (slope, aspect, curvature) in hydrological and risk ML models",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-56 N60",
+          "time_start": "2000-02-11",
+          "time_end": "2000-02-21",
+          "file_format": "HGT",
+          "typical_file_size_mb": "7 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2763266360-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 14297,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"SRTMGL1\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Static 2000-era snapshot; does not capture post-2000 elevation changes",
+            "Voids over water and steep terrain; use NASADEM for void-filled version",
+            "Trees/buildings captured in DSM — not bare-earth DTM"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1711961296-LPCLOUD",
+          "short_name": "ASTGTM",
+          "version": "003",
+          "title": "ASTER Global Digital Elevation Model V003",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/ASTER/ASTGTM.003",
+          "description": "The Terra Advanced Spaceborne Thermal Emission and Reflection Radiometer (ASTER) Global Digital Elevation Model (GDEM) Version 3 (ASTGTM) provides a global digital elevation model (DEM) of land areas on Earth at a spatial resolution of 1 arc second (approximately 30 meter horizontal posting at th...",
+          "ml_use": "30m ASTER GDEM v3 for topographic features, void-filled where SRTM has gaps",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-83 N82",
+          "time_start": "2000-03-01",
+          "time_end": "2013-11-30",
+          "file_format": "COG",
+          "typical_file_size_mb": "16.9 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C1711961296-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 22912,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"ASTGTM\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "ASTER stereo-photogrammetry artifacts in cloudy regions; vertical accuracy ±17m RMSE",
+            "Coarser accuracy than SRTM in flat areas"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2763264762-LPCLOUD",
+          "short_name": "NASADEM_HGT",
+          "version": "001",
+          "title": "NASADEM Merged DEM Global 1 arc second V001",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/MEASURES/NASADEM/NASADEM_HGT.001",
+          "description": "The Land Processes Distributed Active Archive Center (LP DAAC) is responsible for the archive and distribution of the NASA Making Earth System Data Records for Use in Research Environments ([MEaSUREs](https://earthdata.nasa.gov/about/competitive-programs/measures)) Digital Elevation Model (DEM) v...",
+          "ml_use": "NASADEM improved SRTM void-filled DEM for hydrological routing, flood modeling, terrain ML",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-56 N60",
+          "time_start": "2000-02-11",
+          "time_end": "2000-02-21",
+          "file_format": "HGT",
+          "typical_file_size_mb": "7.1 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C2763264762-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 14520,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"NASADEM_HGT\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Improved void-filling over SRTM but same 2000 vintage",
+            "Still DSM not DTM; large forest canopy bias in height"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3974616135-LPCLOUD",
+          "short_name": "GEDI02_B",
+          "version": "003",
+          "title": "GEDI L2B Canopy Cover and Vertical Profile Metrics Data Global Footprint Level V003",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/GEDI/GEDI02_B.003",
+          "description": "The Global Ecosystem Dynamics Investigation ([GEDI](https://gedi.umd.edu/)) mission aims to characterize ecosystem structure and dynamics to enable radically improved quantification and understanding of the Earth’s carbon cycle and biodiversity. The GEDI instrument produces high resolution laser ...",
+          "ml_use": "GEDI 3D forest structure (canopy height, cover) for biomass estimation ML",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority",
+            "Reference_Ground_Track",
+            "SEGMENT_NUMBER"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-54 N54",
+          "time_start": "2024-04-26",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "647.4 MB",
+          "processing_level": "2B",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3974616135-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 114604,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"GEDI02_B\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Along-track footprint (~25m) data; requires spatial gridding for area analysis",
+            "Only available between 51.6°N and 51.6°S (ISS orbit inclination)"
+          ],
+          "tested": true
+        }
+      ]
+    },
+    {
+      "id": "cat_09_human",
+      "topic": "Human Dimensions",
+      "label": "Human Dimensions / Population / Night Lights",
+      "collections": [
+        {
+          "concept_id": "C2980666614-LAADS",
+          "short_name": "VNP46A1",
+          "version": "2",
+          "title": "VIIRS/NPP Daily Gridded Day Night Band 15 arc-second Linear Lat Lon Grid Night V2",
+          "provider": "LAADS",
+          "doi": "10.5067/VIIRS/VNP46A1.002\r\n",
+          "description": "The VIIRS/NPP Daily Gridded Day Night Band 15 arc-second Linear Lat Lon Grid Night product, short-name VNP46A1 is a daily, top-of-atmosphere, at-sensor nighttime radiance product. This product is available at 15 arc-second spatial resolution from January 2012 onward. The VNP46A1/VJ146A1 product c...",
+          "ml_use": "Daily VIIRS nighttime light for urban growth mapping, infrastructure monitoring, power outage detection ML",
+          "variables": [
+            "TileId",
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2012-01-19",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "40 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A1/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://ladsweb.modaps.eosdis.nasa.gov/opendap/RemoteResources/laads/allData/5200/VNP46A1/contents.html",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 3152854,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"VNP46A1\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Strongly affected by moonlight — apply lunar correction; use gap-filled VNP46A2 for monthly ML",
+            "Annual and monthly versions also available (VNP46A3, VNP46A4)"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3365931269-LAADS",
+          "short_name": "VNP46A2",
+          "version": "2",
+          "title": "VIIRS/NPP Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3 Global 15 arc-second Linear Lat Lon Grid V2",
+          "provider": "LAADS",
+          "doi": "10.5067/VIIRS/VNP46A2.002\n",
+          "description": "The SNPP VIIRS Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3 Global 15 arc-second Linear Lat Lon Grid product, short-name VNP46A2 is a daily moonlight- and atmosphere-corrected Nighttime Lights (NTL) product. This product is available at 15 arc-second resolution and contains seven Scie...",
+          "ml_use": "VIIRS gap-filled monthly nighttime light composites for socioeconomic proxy, urban ML, disaster impact",
+          "variables": [
+            "TileId",
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2012-01-19",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "1.5 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A2",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "https://ladsweb.modaps.eosdis.nasa.gov/opendap/RemoteResources/laads/allData/5200/VNP46A2/contents.html",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 2785382,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"VNP46A2\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Gap-filled using temporal compositing; artifacts possible at cloud-persistent locations",
+            "Attenuation correction applied; still not ideal in areas with persistent cloud cover"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3540910651-ESDIS",
+          "short_name": "CIESIN_SEDAC_GPWv4_POPDENS_R11",
+          "version": "4.11",
+          "title": "Gridded Population of the World, Version 4 (GPWv4): Population Density, Revision 11",
+          "provider": "ESDIS",
+          "doi": "10.7927/H49C6VHW",
+          "description": "The Gridded Population of the World, Version 4 (GPWv4): Population Density, Revision 11 consists of estimates of human population density (number of persons per square kilometer) based on counts consistent with national censuses and population registers, for the years 2000, 2005, 2010, 2015, and ...",
+          "ml_use": "Global gridded population density v4.11 for exposure/vulnerability ML, disaster impact assessment",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "",
+          "time_end": "ongoing",
+          "file_format": "ASCII",
+          "typical_file_size_mb": "",
+          "processing_level": "4",
+          "cloud_hosted": false,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3540910651-ESDIS",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 54,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"CIESIN_SEDAC_GPWv4_POPDENS_R11\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "5-year snapshots (2000, 2005, 2010, 2015, 2020); no annual data",
+            "30 arc-second resolution; aggregation from census units may introduce spatial bias"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3860061042-LAADS",
+          "short_name": "VNP46A3",
+          "version": "2",
+          "title": "VIIRS/NPP Lunar BRDF-Adjusted Nighttime Lights Monthly L3 Global 15 arc second Linear Lat Lon Grid V2",
+          "provider": "LAADS",
+          "doi": "10.5067/VIIRS/VNP46A3.002\n",
+          "description": "The Suomi National Polar-orbiting Partnership (SNPP) Visible Infrared Imaging Radiometer Suite (VIIRS) supports a Day-Night Band (DNB) sensor that provides global daily measurements of nocturnal visible and near-infrared (NIR) light that are suitable for Earth system science and applications. The...",
+          "ml_use": "Monthly VIIRS nighttime light composites for urban growth tracking and economic activity ML",
+          "variables": [
+            "TileId",
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2012-01-01",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "12 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 96507,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"VNP46A3\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Monthly gap-filled composites; seasonal variation in NTL (holiday, agricultural burning)",
+            "Overglow/blooming effect near bright sources; not suitable for small-settlement detection"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3860065683-LAADS",
+          "short_name": "VNP46A4",
+          "version": "2",
+          "title": "VIIRS/NPP Lunar BRDF-Adjusted Nighttime Lights Yearly L3 Global 15 arc second Linear Lat Lon Grid V2",
+          "provider": "LAADS",
+          "doi": "10.5067/VIIRS/VNP46A4.002\n",
+          "description": "The Suomi National Polar-orbiting Partnership (SNPP) Visible Infrared Imaging Radiometer Suite (VIIRS) supports a Day-Night Band (DNB) sensor that provides global daily measurements of nocturnal visible and near-infrared (NIR) light that are suitable for Earth system science and applications. The...",
+          "ml_use": "Annual VIIRS nighttime light for multi-year socioeconomic trend analysis, electrification mapping ML",
+          "variables": [
+            "TileId",
+            "HORIZONTALTILENUMBER",
+            "VERTICALTILENUMBER"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2012-01-01",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "92 MB",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A4",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 7560,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"VNP46A4\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Annual averages smooth out short-term events; pair with daily VNP46A1 for event detection"
+          ],
+          "tested": true
+        }
+      ]
+    },
+    {
+      "id": "cat_10_solid_earth",
+      "topic": "Solid Earth",
+      "label": "Solid Earth / Hazards / Deformation / SAR",
+      "collections": [
+        {
+          "concept_id": "C4079844428-LPCLOUD",
+          "short_name": "EMITL2ARFL",
+          "version": "002",
+          "title": "EMIT L2A Surface Reflectance and Uncertainty 60 m V002",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/EMIT/EMITL2ARFL.002",
+          "description": "The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS). EMIT’s prime mission was designed to map surface mineralogy of arid dust source regions using imaging spectroscopy in the visible and short-wave...",
+          "ml_use": "EMIT surface mineralogy/reflectance for geological mapping, mineral identification ML, dust source detection",
+          "variables": [
+            "SOFTWARE_BUILD_VERSION",
+            "identifier_product_doi",
+            "identifier_product_doi_authority",
+            "ORBIT",
+            "SCENE",
+            "SOLAR_ZENITH",
+            "SOLAR_AZIMUTH",
+            "ORBIT_SEGMENT"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-54 N54",
+          "time_start": "2022-08-09",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "3.8 GB",
+          "processing_level": "2A",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C4079844428-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 135705,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"EMITL2ARFL\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "ISS-based hyperspectral; non-uniform spatial coverage — not global gridded product",
+            "380 spectral bands; large file sizes; apply atmospheric correction mask before ML"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3974616135-LPCLOUD",
+          "short_name": "GEDI02_B",
+          "version": "003",
+          "title": "GEDI L2B Canopy Cover and Vertical Profile Metrics Data Global Footprint Level V003",
+          "provider": "LPCLOUD",
+          "doi": "10.5067/GEDI/GEDI02_B.003",
+          "description": "The Global Ecosystem Dynamics Investigation ([GEDI](https://gedi.umd.edu/)) mission aims to characterize ecosystem structure and dynamics to enable radically improved quantification and understanding of the Earth’s carbon cycle and biodiversity. The GEDI instrument produces high resolution laser ...",
+          "ml_use": "GEDI 3D canopy structure for biomass estimation, forest degradation ML, carbon stock assessment",
+          "variables": [
+            "identifier_product_doi",
+            "identifier_product_doi_authority",
+            "Reference_Ground_Track",
+            "SEGMENT_NUMBER"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-54 N54",
+          "time_start": "2024-04-26",
+          "time_end": "ongoing",
+          "file_format": "HDF5",
+          "typical_file_size_mb": "647.4 MB",
+          "processing_level": "2B",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.earthdata.nasa.gov/search/granules?p=C3974616135-LPCLOUD",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 114604,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"GEDI02_B\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Along-track 25m footprint; not uniformly sampled grid; requires spatial aggregation",
+            "Coverage limited to 51.6°N – 51.6°S (ISS orbit)"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C3294057315-ASF",
+          "short_name": "OPERA_L3_DISP-S1_V1",
+          "version": "1",
+          "title": "OPERA Surface Displacement from Sentinel-1 validated product (Version 1)",
+          "provider": "ASF",
+          "doi": "10.5067/SNWG/OPL3DISPS1-V1",
+          "description": "The Level-3 OPERA Sentinel-1 Surface Displacement (DISP) product is generated through interferometric time-series analysis of Level-2 Coregistered Sentinel-1 Single Look Complex (CSLC) datasets. Using a hybrid Persistent Scatterer (PS) and Distributed Scatterer (DS) approach, this product quantif...",
+          "ml_use": "OPERA Sentinel-1 surface displacement maps for subsidence detection ML, earthquake/volcano deformation monitoring",
+          "variables": [
+            "POLARIZATION",
+            "PRODUCT_VERSION",
+            "PROCESSING_TYPE",
+            "FRAME_ID",
+            "STACK_ID",
+            "ASCENDING_DESCENDING",
+            "PATH_NUMBER",
+            "REFERENCE_ZERO_DOPPLER_START_TIME"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "Global",
+          "time_start": "2016-07-01",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "",
+          "processing_level": "3",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.asf.alaska.edu/#/?dataset=OPERA-S1&productTypes=DISP-S1&resultsLoaded=true",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 205761,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"OPERA_L3_DISP-S1_V1\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Validated product v1; check baseline date pairs for coherence",
+            "Displacement relative to reference epoch — not absolute elevation change"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2859376221-ASF",
+          "short_name": "ARIA_S1_GUNW",
+          "version": "1",
+          "title": "ARIA Sentinel-1 Geocoded Unwrapped Interferograms",
+          "provider": "ASF",
+          "doi": "",
+          "description": "Level-2 interferometric products generated by the Jet Propulsion Lab (JPL) ARIA project. The creation, discovery, and distribution of these products support InSAR science around tectonically active regions, volcanoes, or areas of subsidence/uplift. The generation of the ARIA-S1-GUNW products was ...",
+          "ml_use": "ARIA Sentinel-1 InSAR unwrapped interferograms for land deformation ML, infrastructure monitoring",
+          "variables": [
+            "ASCENDING_DESCENDING",
+            "BEAM_MODE",
+            "POLARIZATION",
+            "PATH_NUMBER",
+            "PERPENDICULAR_BASELINE",
+            "VERSION",
+            "FRAME_NUMBER",
+            "TEMPORAL_BASELINE_DAYS"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2014-06-15",
+          "time_end": "ongoing",
+          "file_format": "netCDF-4",
+          "typical_file_size_mb": "",
+          "processing_level": "2",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.asf.alaska.edu/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 470824,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"ARIA_S1_GUNW\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Requires phase unwrapping; atmospheric artifacts (tropospheric delay) must be corrected",
+            "12-day repeat; temporal decorrelation limits use in vegetated areas"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C2027429276-GES_DISC",
+          "short_name": "MSVOLSO2L4",
+          "version": "4",
+          "title": "Multi-Satellite Volcanic Sulfur Dioxide L4 Long-Term Global Database V4 (MSVOLSO2L4)",
+          "provider": "GES_DISC",
+          "doi": "10.5067/MEASURES/SO2/DATA405",
+          "description": "Version 4 is the current version of the data set. Older versions are no longer available and have been superseded by Version 4.\n\nThese data are a part of MEaSUREs 2012 projects. The particular project, \"Multi-Decadal Sulfur Dioxide Climatology from Satellite Instruments\", is expected to produce S...",
+          "ml_use": "Multi-satellite volcanic SO2 L4 for eruption detection, aviation hazard ML, atmospheric chemistry studies",
+          "variables": [],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "1978-10-31",
+          "time_end": "2026-05-13",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "4",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://measures.gesdisc.eosdis.nasa.gov/data/SO2/MSVOLSO2L4.4/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 1,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"MSVOLSO2L4\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Event-based product — not uniform temporal sampling",
+            "SO2 mass estimates uncertain for large eruptions that saturate sensors"
+          ],
+          "tested": true
+        },
+        {
+          "concept_id": "C1214470488-ASF",
+          "short_name": "SENTINEL-1A_SLC",
+          "version": "1",
+          "title": "Sentinel-1A Single Look Complex Product",
+          "provider": "ASF",
+          "doi": "",
+          "description": "Sentinel-1A, the first satellite in the Sentinel-1 constellation, was launched April 3, 2014.  The Sentinel-1 satellites (Sentinel-1A, Sentinel-1B, and Sentinel-1C) are sun-synchronous polar-orbiting satellites that operate day and night performing C-band synthetic aperture radar (SAR) imaging. T...",
+          "ml_use": "Sentinel-1A SAR SLC data for custom InSAR processing, change detection ML, flood mapping",
+          "variables": [
+            "SV_POSITION_PRE",
+            "SV_VELOCITY_PRE",
+            "SV_POSITION_POST",
+            "SV_VELOCITY_POST",
+            "ASC_NODE_TIME",
+            "SV_START_POSITION",
+            "SV_START_VELOCITY",
+            "SV_CENTER_POSITION"
+          ],
+          "spatial_resolution": "",
+          "temporal_resolution": "",
+          "spatial_coverage": "W-180 E180 S-90 N90",
+          "time_start": "2014-04-03",
+          "time_end": "ongoing",
+          "file_format": "",
+          "typical_file_size_mb": "",
+          "processing_level": "1",
+          "cloud_hosted": true,
+          "needs_earthdata_login": true,
+          "access": {
+            "https": "https://search.asf.alaska.edu/",
+            "s3_direct": false,
+            "s3_credentials_endpoint": "",
+            "opendap": "",
+            "harmony": "",
+            "gibs_layer": ""
+          },
+          "granule_count": 2140803,
+          "earthaccess_snippet": "import earthaccess\nearthaccess.login(strategy=\"environment\")\nresults = earthaccess.search_data(\n    short_name=\"SENTINEL-1A_SLC\",\n    temporal=(\"2023-01-01\", \"2023-01-31\"),\n    bounding_box=(-10, 35, 10, 45),\n    count=2\n)\nprint(f\"Found {len(results)} granules\")\n# files = earthaccess.open(results)  # stream without downloading\n",
+          "gotchas": [
+            "Raw SLC requires significant processing (focusing, coregistration, interferometry) before ML use",
+            "Large file sizes (1-4 GB per scene); cloud processing recommended"
+          ],
+          "tested": true
+        }
+      ]
+    }
+  ],
+  "decision_guide": [
+    {
+      "ml_task": "Crop mapping / type classification",
+      "primary": "HLSL30 or HLSS30",
+      "secondary": "MCD12Q1 (labels)",
+      "join_key": "lat/lon/date",
+      "notes": "30m multi-spectral time series; apply Fmask QA; use 10+ bands"
+    },
+    {
+      "ml_task": "Vegetation health / drought monitoring",
+      "primary": "MOD13A2 (NDVI 16-day)",
+      "secondary": "GPM_3IMERGDF + SPL4SMGP",
+      "join_key": "lat/lon/date resampled to common grid",
+      "notes": "Anomaly detection: compare to climatology baseline"
+    },
+    {
+      "ml_task": "Wildfire risk prediction",
+      "primary": "MOD13A2 + MOD04_3K",
+      "secondary": "MCD64A1 (labels) + GPM_3IMERGDF",
+      "join_key": "lat/lon/week",
+      "notes": "Feature stack: NDVI, LST, precip, wind (MERRA-2), slope (SRTM)"
+    },
+    {
+      "ml_task": "Flood mapping / detection",
+      "primary": "SENTINEL-1A_SLC (SAR)",
+      "secondary": "GPM_3IMERGDF + NASADEM_HGT",
+      "join_key": "lat/lon/event date",
+      "notes": "SAR backscatter change detection; DEM for terrain routing"
+    },
+    {
+      "ml_task": "Air quality / PM2.5 estimation",
+      "primary": "MCD19A2 (MAIAC AOD)",
+      "secondary": "M2T1NXSLV (met fields)",
+      "join_key": "lat/lon/day",
+      "notes": "AOD→PM2.5 regression; add surface elevation (NASADEM)"
+    },
+    {
+      "ml_task": "Marine heatwave / coral bleaching risk",
+      "primary": "MUR-JPL-L4-GLOB-v4.1 (SST)",
+      "secondary": "MODISA_L3m_CHL",
+      "join_key": "lat/lon/week",
+      "notes": "SST anomaly from climatology; CHL as productivity stress proxy"
+    },
+    {
+      "ml_task": "Sea ice extent / area prediction",
+      "primary": "NSIDC-0051 (passive microwave)",
+      "secondary": "M2T1NXSLV (surface temperature)",
+      "join_key": "lat/lon/month",
+      "notes": "Classification or regression on ice fraction; temporal sequence for LSTM"
+    },
+    {
+      "ml_task": "Urban growth / light pollution mapping",
+      "primary": "VNP46A3 (monthly NTL)",
+      "secondary": "CIESIN_SEDAC_GPWv4_POPDENS",
+      "join_key": "lat/lon/year",
+      "notes": "Correlate NTL growth with population density changes"
+    },
+    {
+      "ml_task": "Land deformation / subsidence monitoring",
+      "primary": "OPERA_L3_DISP-S1_V1 (InSAR displacement)",
+      "secondary": "ARIA_S1_GUNW (interferograms)",
+      "join_key": "lat/lon/epoch-pair",
+      "notes": "Time-series InSAR; apply atmospheric correction; mask water"
+    },
+    {
+      "ml_task": "Glacier / ice sheet mass balance",
+      "primary": "ATL06 (ICESat-2 elevation)",
+      "secondary": "TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4 (GRACE)",
+      "join_key": "glacier RGI outline / monthly",
+      "notes": "Elevation differencing for mass balance; GRACE for basin-scale water loss"
+    }
+  ]
+}
