@@ -83,6 +83,25 @@ Create a map and a short table of candidate locations. For every location show:
 - where the analogy breaks down;
 - what field, instrument, or additional dataset should be used next.
 
+## What happens after the first Earth filtering
+
+The first filter is only a broad candidate generator. After higher-resolution
+validation, apply a second, process-specific filter to the survivors:
+
+1. Keep the validated planetary process distributions and their uncertainty
+   ranges.
+2. Compute a separate Earth score for each process using its required
+   variables, rather than one universal score.
+3. Add practical constraints such as accessibility, protected areas, season,
+   infrastructure, and field safety when the challenge requires a usable test
+   site.
+4. Rank the remaining locations and report the evidence behind every score.
+
+This should initially be a transparent weighted/rule-based model with
+sensitivity tests. A machine-learning classifier should only be introduced if
+we obtain labeled examples of successful and unsuccessful analog sites; without
+labels it would create confident-looking but unsupported classifications.
+
 ## Rules for continuation
 
 - Preserve raw downloads and provenance; derived tables are not replacements.
@@ -92,4 +111,3 @@ Create a map and a short table of candidate locations. For every location show:
 - Never describe a statistical similarity as proof of a physical process.
 - Keep credentials in Kaggle Secrets or environment variables; never commit
   tokens to notebooks or Git.
-
