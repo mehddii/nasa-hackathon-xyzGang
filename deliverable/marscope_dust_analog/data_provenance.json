@@ -1,0 +1,7 @@
+{
+  "mars_reference": "NASA PDS-derived Mars process distributions from notebooks 01, 03, and 06",
+  "earth_screening": "NASA POWER and land-mask refinement from notebooks 08 and 09",
+  "process_registry": "Literature-backed Mars process registry in notebook 06",
+  "method": "percentile-normalized marginal and joint similarity plus spatial coherence",
+  "context_sites_used_as_reported_results": false
+}

@@ -1,0 +1,12 @@
+{
+  "candidate_count": 346,
+  "top_location": {
+    "latitude": 32.0,
+    "longitude": -105.0,
+    "rank": 1,
+    "analog_score": 0.7387621079119041
+  },
+  "top10_mean_score": 0.7317425940092981,
+  "process": "regolith_mantling_or_dust_cover",
+  "excluded_context_sites": true
+}
