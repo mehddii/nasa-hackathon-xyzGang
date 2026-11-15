@@ -111,3 +111,86 @@ labels it would create confident-looking but unsupported classifications.
 - Never describe a statistical similarity as proof of a physical process.
 - Keep credentials in Kaggle Secrets or environment variables; never commit
   tokens to notebooks or Git.
+
+## Required analogy dimensions
+
+Every Mars process must be described using the dimensions that are actually
+available in the data. Do not force all dimensions into every process, and do
+not fill missing dimensions with guesses.
+
+- **Geology, mineralogy, and surface materials:** composition, mineral or
+  spectral indicators, albedo, thermal properties, dust/regolith indicators.
+- **Terrain and topography:** elevation, slope, roughness, relief, crater or
+  landform context, and connected-region shape.
+- **Temperature and environmental extremes:** mean and seasonal temperature,
+  minimum/maximum extremes, illumination, and thermal range.
+- **Water and ice:** ice/hydrogen indicators, precipitation, snow, glaciers,
+  permafrost, and seasonal persistence where available.
+- **Dust, wind, and erosion:** wind, aridity, aerosol/dust observations,
+  sedimentary texture, and erosion proxies.
+- **Biology and habitability:** Earth-only context such as biology,
+  extremophiles, habitability, and biosignatures; these must not be presented
+  as Mars measurements.
+- **Caves and subsurface environments:** lava tubes, caves, radar/subsurface
+  indicators, fractures, and underground access where a documented dataset
+  exists.
+- **Operations:** landing slope, roughness, navigation, mobility, illumination,
+  accessibility, communications, and construction-relevant constraints.
+
+Each process specification must list which dimensions are used, which are
+unavailable, and why the chosen Earth variable is a defensible proxy.
+
+## Exact matching and machine-learning design
+
+The project uses a two-stage model:
+
+### Stage A — broad candidate generation
+
+For each process, compare every Earth cell with the Mars process signature using
+three transparent components:
+
+1. **Marginal distribution similarity:** compare each feature's percentile or
+   quantile range, not just its mean.
+2. **Joint similarity:** compare the complete feature vector after robust
+   scaling, using a distance such as Euclidean or Mahalanobis distance when the
+   covariance estimate is stable.
+3. **Spatial coherence:** reward neighboring Earth cells that have similar
+   scores; isolated single-cell matches are weaker evidence.
+
+Combine these into a documented score with equal weights initially. Run a
+sensitivity analysis with alternative weights. Preserve the three component
+scores so the result is explainable.
+
+### Stage B — process-specific validation
+
+Refine only the highest-ranked Earth areas using higher-resolution data. Add
+terrain, geology, aerosol, ice/water, subsurface, or operations variables only
+when their source and resolution are recorded. Recalculate the score and keep
+an uncertainty interval and an evidence/limitation explanation for every
+candidate.
+
+This is an **unsupervised similarity and ranking model**, not a supervised
+classifier. Do not invent labels or claim that clustering discovered a named
+process. Clustering and anomaly detection may discover unusual region types,
+but scientific papers and independent measurements are required before calling
+one a process.
+
+Use PCA only as an interpretable compression option for high-dimensional
+spectra. Use autoencoders or neural embeddings only as a comparison experiment,
+never as the sole evidence. A black-box model must not replace the transparent
+baseline.
+
+## Evidence required for credible results
+
+For each process and candidate, report:
+
+- the Mars evidence recipe and scientific source;
+- the Earth variables and product IDs;
+- raw values, transformed values, and missingness;
+- marginal, joint, and spatial scores;
+- uncertainty and sensitivity to weights;
+- comparison with random Earth cells and known analog sites;
+- alternative explanations and what the data cannot establish.
+
+The final claim must be phrased as compatibility with a measured process
+signature, never as proof that Earth and Mars have identical environments.
