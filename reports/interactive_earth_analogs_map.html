@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NASA Planetary Analog Sites Portfolio - Interactive Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #map { height: 100%; width: 100%; }
+        .legend {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            line-height: 22px;
+            font-size: 13px;
+        }
+        .legend h4 { margin: 0 0 8px; font-size: 15px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 5px; }
+        .legend-color { width: 16px; height: 16px; border-radius: 50%; margin-right: 8px; display: inline-block; border: 2px solid white; box-shadow: 0 0 3px rgba(0,0,0,0.4); }
+        .custom-popup .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .popup-title { font-size: 15px; font-weight: bold; margin-bottom: 4px; color: #0284c7; }
+        .popup-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; margin-bottom: 6px; }
+        .popup-info { font-size: 12px; color: #334155; line-height: 1.5; }
+        .popup-link { display: inline-block; margin-top: 8px; padding: 4px 10px; background: #0284c7; color: white; text-decoration: none; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .popup-link:hover { background: #0369a1; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+    const geojsonData = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [-87.189, -80.66]}, "properties": {"site_id": "earth_grid_0047", "name": "Terrestrial Site Antarctica #048", "country": "Antarctica", "target_id": "moon_artemis_south_pole_cold_trap", "target_body": "Moon", "rank": 1, "fidelity_score": 0.833, "psi_score": 0.898, "topsis_score": 0.767, "benchmark_role": "Global Grid Candidate", "primary_geology": "Antarctica regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [160.85, -77.85]}, "properties": {"site_id": "earth_site_005", "name": "McMurdo Dry Valleys (University Valley)", "country": "Antarctica", "target_id": "moon_artemis_south_pole_cold_trap", "target_body": "Moon", "rank": 2, "fidelity_score": 0.809, "psi_score": 0.901, "topsis_score": 0.716, "benchmark_role": "NASA Artemis Polar Cold Trap & Mars Ice Analog", "primary_geology": "Hyper-arid dry permafrost & sandstone regolith"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [63.957, -83.023]}, "properties": {"site_id": "earth_grid_0009", "name": "Terrestrial Site Antarctica #010", "country": "Antarctica", "target_id": "moon_artemis_south_pole_cold_trap", "target_body": "Moon", "rank": 3, "fidelity_score": 0.806, "psi_score": 0.826, "topsis_score": 0.785, "benchmark_role": "Global Grid Candidate", "primary_geology": "Antarctica regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-80.565, -81.471]}, "properties": {"site_id": "earth_grid_0069", "name": "Terrestrial Site Antarctica #070", "country": "Antarctica", "target_id": "moon_artemis_south_pole_cold_trap", "target_body": "Moon", "rank": 4, "fidelity_score": 0.802, "psi_score": 0.845, "topsis_score": 0.758, "benchmark_role": "Global Grid Candidate", "primary_geology": "Antarctica regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [93.595, -74.251]}, "properties": {"site_id": "earth_grid_0114", "name": "Terrestrial Site Antarctica #115", "country": "Antarctica", "target_id": "moon_artemis_south_pole_cold_trap", "target_body": "Moon", "rank": 5, "fidelity_score": 0.799, "psi_score": 0.887, "topsis_score": 0.71, "benchmark_role": "Global Grid Candidate", "primary_geology": "Antarctica regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-13.65, 29.04]}, "properties": {"site_id": "earth_site_004", "name": "Lanzarote Volcanic Fields", "country": "Spain (Canary Islands)", "target_id": "moon_marius_hills_lava_tube", "target_body": "Moon", "rank": 1, "fidelity_score": 0.911, "psi_score": 0.979, "topsis_score": 0.842, "benchmark_role": "ESA Pangea & Astronaut Subsurface Training", "primary_geology": "Basaltic lava tubes (Cueva de los Verdes)"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-121.51, 41.71]}, "properties": {"site_id": "earth_site_009", "name": "Lava Beds National Monument", "country": "USA (California)", "target_id": "moon_marius_hills_lava_tube", "target_body": "Moon", "rank": 2, "fidelity_score": 0.873, "psi_score": 0.968, "topsis_score": 0.778, "benchmark_role": "USGS Lunar Base Cave Habitat Analog", "primary_geology": "Medicine Lake volcano basalt lava tubes"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-155.47, 19.82]}, "properties": {"site_id": "earth_site_003", "name": "Mauna Kea & Mauna Loa", "country": "USA (Hawaii)", "target_id": "moon_marius_hills_lava_tube", "target_body": "Moon", "rank": 3, "fidelity_score": 0.609, "psi_score": 0.929, "topsis_score": 0.288, "benchmark_role": "NASA HI-SEAS & Apollo Sintering Analog", "primary_geology": "Unweathered tholeiitic basalt & tephra"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-18.15, 63.68]}, "properties": {"site_id": "earth_site_008", "name": "Eldhraun & Askja Volcanic Highlands", "country": "Iceland", "target_id": "moon_marius_hills_lava_tube", "target_body": "Moon", "rank": 4, "fidelity_score": 0.528, "psi_score": 0.916, "topsis_score": 0.141, "benchmark_role": "NASA Apollo Astronaut Field Geology & Rover Mobility", "primary_geology": "Recent pahoehoe & a'a vesicular basalt"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [101.201, 41.659]}, "properties": {"site_id": "earth_grid_0170", "name": "Terrestrial Site Gobi #171", "country": "Gobi", "target_id": "moon_mare_basalt_sintering", "target_body": "Moon", "rank": 1, "fidelity_score": 0.896, "psi_score": 0.903, "topsis_score": 0.888, "benchmark_role": "Global Grid Candidate", "primary_geology": "Gobi regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-13.65, 29.04]}, "properties": {"site_id": "earth_site_004", "name": "Lanzarote Volcanic Fields", "country": "Spain (Canary Islands)", "target_id": "moon_mare_basalt_sintering", "target_body": "Moon", "rank": 2, "fidelity_score": 0.89, "psi_score": 0.901, "topsis_score": 0.88, "benchmark_role": "ESA Pangea & Astronaut Subsurface Training", "primary_geology": "Basaltic lava tubes (Cueva de los Verdes)"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-121.51, 41.71]}, "properties": {"site_id": "earth_site_009", "name": "Lava Beds National Monument", "country": "USA (California)", "target_id": "moon_mare_basalt_sintering", "target_body": "Moon", "rank": 3, "fidelity_score": 0.89, "psi_score": 0.901, "topsis_score": 0.879, "benchmark_role": "USGS Lunar Base Cave Habitat Analog", "primary_geology": "Medicine Lake volcano basalt lava tubes"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-65.901, -26.121]}, "properties": {"site_id": "earth_grid_0187", "name": "Terrestrial Site Andes #188", "country": "Andes", "target_id": "moon_mare_basalt_sintering", "target_body": "Moon", "rank": 4, "fidelity_score": 0.885, "psi_score": 0.892, "topsis_score": 0.879, "benchmark_role": "Global Grid Candidate", "primary_geology": "Andes regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-7.62, 30.7]}, "properties": {"site_id": "earth_site_011", "name": "Anti-Atlas Volcanic Terranes (Jbel Sirwa)", "country": "Morocco", "target_id": "moon_mare_basalt_sintering", "target_body": "Moon", "rank": 5, "fidelity_score": 0.879, "psi_score": 0.894, "topsis_score": 0.865, "benchmark_role": "Novel Lunar Sintering & Mars Mafic Volcanic Analog", "primary_geology": "Neogene basalt plateaus & phonolitic volcanic plugs"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-5.84, 30.33]}, "properties": {"site_id": "earth_site_012", "name": "Zagora / Fezouata Paleolake Basin", "country": "Morocco", "target_id": "mars_jezero_lacustrine_delta", "target_body": "Mars", "rank": 1, "fidelity_score": 0.954, "psi_score": 0.946, "topsis_score": 0.962, "benchmark_role": "Novel Mars Jezero / Gale Lacustrine Delta Analog", "primary_geology": "Clay-rich mudstone & evaporite sulfate strata"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [119.35, -21.15]}, "properties": {"site_id": "earth_site_010", "name": "Pilbara Craton (North Pole)", "country": "Australia", "target_id": "mars_jezero_lacustrine_delta", "target_body": "Mars", "rank": 2, "fidelity_score": 0.91, "psi_score": 0.91, "topsis_score": 0.911, "benchmark_role": "NASA/ESA Astrobiology Archean Biosignature Analog", "primary_geology": "Archean hydrothermal barite & chert beds"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [50.237, 19.217]}, "properties": {"site_id": "earth_grid_0213", "name": "Terrestrial Site Arabia #214", "country": "Arabia", "target_id": "mars_jezero_lacustrine_delta", "target_body": "Mars", "rank": 3, "fidelity_score": 0.894, "psi_score": 0.91, "topsis_score": 0.879, "benchmark_role": "Global Grid Candidate", "primary_geology": "Arabia regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [7.788, 26.492]}, "properties": {"site_id": "earth_grid_0082", "name": "Terrestrial Site Sahara #083", "country": "Sahara", "target_id": "mars_jezero_lacustrine_delta", "target_body": "Mars", "rank": 4, "fidelity_score": 0.889, "psi_score": 0.876, "topsis_score": 0.903, "benchmark_role": "Global Grid Candidate", "primary_geology": "Sahara regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-68.33, -21.674]}, "properties": {"site_id": "earth_grid_0118", "name": "Terrestrial Site Andes #119", "country": "Andes", "target_id": "mars_jezero_lacustrine_delta", "target_body": "Mars", "rank": 5, "fidelity_score": 0.855, "psi_score": 0.851, "topsis_score": 0.859, "benchmark_role": "Global Grid Candidate", "primary_geology": "Andes regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-7.62, 30.7]}, "properties": {"site_id": "earth_site_011", "name": "Anti-Atlas Volcanic Terranes (Jbel Sirwa)", "country": "Morocco", "target_id": "mars_syrtis_major_volcanic_shield", "target_body": "Mars", "rank": 1, "fidelity_score": 0.962, "psi_score": 0.969, "topsis_score": 0.954, "benchmark_role": "Novel Lunar Sintering & Mars Mafic Volcanic Analog", "primary_geology": "Neogene basalt plateaus & phonolitic volcanic plugs"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-13.65, 29.04]}, "properties": {"site_id": "earth_site_004", "name": "Lanzarote Volcanic Fields", "country": "Spain (Canary Islands)", "target_id": "mars_syrtis_major_volcanic_shield", "target_body": "Mars", "rank": 2, "fidelity_score": 0.923, "psi_score": 0.932, "topsis_score": 0.915, "benchmark_role": "ESA Pangea & Astronaut Subsurface Training", "primary_geology": "Basaltic lava tubes (Cueva de los Verdes)"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-65.901, -26.121]}, "properties": {"site_id": "earth_grid_0187", "name": "Terrestrial Site Andes #188", "country": "Andes", "target_id": "mars_syrtis_major_volcanic_shield", "target_body": "Mars", "rank": 3, "fidelity_score": 0.845, "psi_score": 0.859, "topsis_score": 0.832, "benchmark_role": "Global Grid Candidate", "primary_geology": "Andes regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [14.433, 23.039]}, "properties": {"site_id": "earth_grid_0159", "name": "Terrestrial Site Sahara #160", "country": "Sahara", "target_id": "mars_syrtis_major_volcanic_shield", "target_body": "Mars", "rank": 4, "fidelity_score": 0.8, "psi_score": 0.848, "topsis_score": 0.752, "benchmark_role": "Global Grid Candidate", "primary_geology": "Sahara regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-69.208, -24.507]}, "properties": {"site_id": "earth_grid_0253", "name": "Terrestrial Site Andes #254", "country": "Andes", "target_id": "mars_syrtis_major_volcanic_shield", "target_body": "Mars", "rank": 5, "fidelity_score": 0.79, "psi_score": 0.849, "topsis_score": 0.732, "benchmark_role": "Global Grid Candidate", "primary_geology": "Andes regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-3.98, 31.15]}, "properties": {"site_id": "earth_site_013", "name": "Erg Chebbi / Merzouga Sand Dunes", "country": "Morocco", "target_id": "mars_gale_aeolian_dunes", "target_body": "Mars", "rank": 1, "fidelity_score": 0.977, "psi_score": 0.981, "topsis_score": 0.973, "benchmark_role": "Novel Mars Gale Bagnold Dunes Mobility Analog", "primary_geology": "Active quartz-feldspar aeolian barchan dunes"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [3.928, 24.609]}, "properties": {"site_id": "earth_grid_0276", "name": "Terrestrial Site Sahara #277", "country": "Sahara", "target_id": "mars_gale_aeolian_dunes", "target_body": "Mars", "rank": 2, "fidelity_score": 0.814, "psi_score": 0.858, "topsis_score": 0.771, "benchmark_role": "Global Grid Candidate", "primary_geology": "Sahara regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-87.189, -80.66]}, "properties": {"site_id": "earth_grid_0047", "name": "Terrestrial Site Antarctica #048", "country": "Antarctica", "target_id": "mars_gale_aeolian_dunes", "target_body": "Mars", "rank": 3, "fidelity_score": 0.809, "psi_score": 0.812, "topsis_score": 0.807, "benchmark_role": "Global Grid Candidate", "primary_geology": "Antarctica regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [43.764, 25.876]}, "properties": {"site_id": "earth_grid_0214", "name": "Terrestrial Site Arabia #215", "country": "Arabia", "target_id": "mars_gale_aeolian_dunes", "target_body": "Mars", "rank": 4, "fidelity_score": 0.809, "psi_score": 0.822, "topsis_score": 0.796, "benchmark_role": "Global Grid Candidate", "primary_geology": "Arabia regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [44.069, 21.26]}, "properties": {"site_id": "earth_grid_0201", "name": "Terrestrial Site Arabia #202", "country": "Arabia", "target_id": "mars_gale_aeolian_dunes", "target_body": "Mars", "rank": 5, "fidelity_score": 0.807, "psi_score": 0.835, "topsis_score": 0.778, "benchmark_role": "Global Grid Candidate", "primary_geology": "Arabia regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-89.67, 75.38]}, "properties": {"site_id": "earth_site_002", "name": "Haughton Impact Crater (Devon Island)", "country": "Canada", "target_id": "mars_utopia_planitia_permafrost", "target_body": "Mars", "rank": 1, "fidelity_score": 0.916, "psi_score": 0.959, "topsis_score": 0.873, "benchmark_role": "NASA Haughton-Mars Project (HMP)", "primary_geology": "Impact breccia & continuous permafrost"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-40.627, 72.668]}, "properties": {"site_id": "earth_grid_0078", "name": "Terrestrial Site Arctic #079", "country": "Arctic", "target_id": "mars_utopia_planitia_permafrost", "target_body": "Mars", "rank": 2, "fidelity_score": 0.854, "psi_score": 0.921, "topsis_score": 0.787, "benchmark_role": "Global Grid Candidate", "primary_geology": "Arctic regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-78.561, 80.992]}, "properties": {"site_id": "earth_grid_0007", "name": "Terrestrial Site Arctic #008", "country": "Arctic", "target_id": "mars_utopia_planitia_permafrost", "target_body": "Mars", "rank": 3, "fidelity_score": 0.848, "psi_score": 0.919, "topsis_score": 0.776, "benchmark_role": "Global Grid Candidate", "primary_geology": "Arctic regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-8.394, 72.785]}, "properties": {"site_id": "earth_grid_0148", "name": "Terrestrial Site Arctic #149", "country": "Arctic", "target_id": "mars_utopia_planitia_permafrost", "target_body": "Mars", "rank": 4, "fidelity_score": 0.846, "psi_score": 0.918, "topsis_score": 0.773, "benchmark_role": "Global Grid Candidate", "primary_geology": "Arctic regional regolith / bedrock"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [22.504, 70.446]}, "properties": {"site_id": "earth_grid_0271", "name": "Terrestrial Site Arctic #272", "country": "Arctic", "target_id": "mars_utopia_planitia_permafrost", "target_body": "Mars", "rank": 5, "fidelity_score": 0.845, "psi_score": 0.915, "topsis_score": 0.776, "benchmark_role": "Global Grid Candidate", "primary_geology": "Arctic regional regolith / bedrock"}}]};
+
+    const missionColors = {
+        "moon_artemis_south_pole_cold_trap": "#0284c7",
+        "moon_marius_hills_lava_tube": "#ea580c",
+        "moon_mare_basalt_sintering": "#475569",
+        "mars_jezero_lacustrine_delta": "#16a34a",
+        "mars_syrtis_major_volcanic_shield": "#dc2626",
+        "mars_gale_aeolian_dunes": "#ca8a04",
+        "mars_utopia_planitia_permafrost": "#9333ea"
+    };
+
+    const missionNames = {
+        "moon_artemis_south_pole_cold_trap": "Moon: Artemis South Pole (Cold Traps)",
+        "moon_marius_hills_lava_tube": "Moon: Marius Hills (Lava Tubes)",
+        "moon_mare_basalt_sintering": "Moon: Mare Basalt (Sintering)",
+        "mars_jezero_lacustrine_delta": "Mars: Jezero Crater (Lacustrine Clays)",
+        "mars_syrtis_major_volcanic_shield": "Mars: Syrtis Major (Basalt Mobility)",
+        "mars_gale_aeolian_dunes": "Mars: Gale Crater (Barchan Dunes)",
+        "mars_utopia_planitia_permafrost": "Mars: Utopia Planitia (Ground Ice)"
+    };
+
+    // Satellite Base Layer (Esri World Imagery)
+    const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    });
+
+    const map = L.map('map', {
+        center: [20.0, 0.0],
+        zoom: 3,
+        layers: [esriSat]
+    });
+
+    const baseMaps = {
+        "Satellite Imagery (Esri)": esriSat,
+        "OpenStreetMap": osm
+    };
+    L.control.layers(baseMaps).addTo(map);
+
+    // Add Markers from GeoJSON
+    L.geoJSON(geojsonData, {
+        pointToLayer: function (feature, latlng) {
+            const tid = feature.properties.target_id;
+            const color = missionColors[tid] || "#2563eb";
+            return L.circleMarker(latlng, {
+                radius: feature.properties.rank === 1 ? 11 : 8,
+                fillColor: color,
+                color: "#ffffff",
+                weight: feature.properties.rank === 1 ? 3 : 1.5,
+                opacity: 1,
+                fillOpacity: 0.9
+            });
+        },
+        onEachFeature: function (feature, layer) {
+            const p = feature.properties;
+            const tid = p.target_id;
+            const color = missionColors[tid] || "#2563eb";
+            const gmapsUrl = `https://www.google.com/maps?q=${feature.geometry.coordinates[1]},${feature.geometry.coordinates[0]}&t=k`;
+            
+            const popupContent = `
+                <div class="custom-popup">
+                    <div class="popup-title">${p.name}</div>
+                    <span class="popup-badge" style="background:${color};">${p.target_body} &bull; Rank #${p.rank}</span>
+                    <div class="popup-info">
+                        <strong>Country:</strong> ${p.country}<br/>
+                        <strong>Coordinates:</strong> ${feature.geometry.coordinates[1].toFixed(3)}°N, ${feature.geometry.coordinates[0].toFixed(3)}°E<br/>
+                        <strong>Fidelity Score:</strong> ${(p.fidelity_score * 100).toFixed(1)}% (PSI: ${p.psi_score}, TOPSIS: ${p.topsis_score})<br/>
+                        <strong>Geology:</strong> ${p.primary_geology}<br/>
+                        <strong>Role:</strong> ${p.benchmark_role}
+                    </div>
+                    <a href="${gmapsUrl}" target="_blank" class="popup-link">Open in Google Satellite &rarr;</a>
+                </div>
+            `;
+            layer.bindPopup(popupContent);
+        }
+    }).addTo(map);
+
+    // Legend
+    const legend = L.control({position: 'bottomleft'});
+    legend.onAdd = function (map) {
+        const div = L.DomUtil.create('div', 'legend');
+        div.innerHTML = '<h4>NASA Exploration Targets</h4>';
+        for (const [key, name] of Object.entries(missionNames)) {
+            const color = missionColors[key];
+            div.innerHTML += `
+                <div class="legend-item">
+                    <span class="legend-color" style="background:${color};"></span>
+                    <span>${name}</span>
+                </div>
+            `;
+        }
+        return div;
+    };
+    legend.addTo(map);
+</script>
+</body>
+</html>
