@@ -16,6 +16,12 @@ The implementation order is now:
 | 8 | `08_earth_dust_environment_matching.ipynb` | Query actual Earth climatology through NASA POWER, compare it with the Mars dust-compatible distribution using rank, joint, and spatial scores, and inventory MODIS follow-up coverage through CMR |
 | 9 | `09_earth_refined_validation.ipynb` | Refine the top Earth candidates on a 1° local grid, apply a real land mask, re-query NASA POWER, and inventory higher-resolution MODIS follow-up coverage through CMR |
 | 11 | `11_mars_process_readiness_audit.ipynb` | Gate each proposed Mars process on actual measurements and validation evidence; unsupported processes remain inconclusive and are not Earth-matched |
+| 12 | `12_final_multi_criteria_ranking.ipynb` | Combine validated process-specific Earth scores using explicit priorities, evidence coverage, missingness penalties, and sensitivity scenarios |
+| 13 | `13_mars_erosion_sediment_transport.ipynb` | Audit Mars evidence for erosion and sediment transport; stop before Earth matching if required morphology/material evidence is absent |
+| 14 | `14_mars_volcanic_basaltic_terrain.ipynb` | Audit Mars composition and flow-morphology evidence for volcanic/basaltic terrain; fail closed when composition is unavailable |
+| 15 | `15_mars_ice_permafrost_dynamics.ipynb` | Audit hydrogen, thermal, and seasonal evidence for ice/permafrost; no Earth matching without validated volatile evidence |
+| 16 | `16_mars_water_driven_alteration.ipynb` | Audit CRISM/mineral and geological-context evidence for water-driven alteration; preserve inconclusive status without spectral confirmation |
+| 17 | `17_mars_impact_crater_terrain.ipynb` | Audit independent crater morphology and terrain evidence before any Earth comparison |
 
 Preparation notebooks stop at cell-level data. Region size, shape, internal variation, neighbors, clustering, anomaly detection, and neutral signatures belong to notebooks 3 and 4. Final process interpretation requires the later targeted validation stage described in the design document.
 
