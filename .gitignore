@@ -1,6 +1,8 @@
 # Locally built or executed notebook artifacts
 build/
 outputs/
+processed/
+reports/
 
 # Local scratch scripts
 scratch/
