@@ -26,13 +26,17 @@ def _scores(mars: pd.DataFrame, earth: pd.DataFrame, features: list[str]) -> pd.
     iqr = iqr.fillna(m.std().replace(0, np.nan)).fillna(1.0)
     ez = (e - med) / iqr
     q05, q95 = m.quantile(.05), m.quantile(.95)
-    marginal = (1 - ((e.sub(q05).clip(lower=0) + e.sub(q95).clip(upper=0).abs()) / (q95 - q05).replace(0, 1)).mean(axis=1).clip(0, 1)).fillna(0)
+    # Only values outside the Mars 5th–95th percentile envelope are penalized.
+    # Values inside the envelope must not receive a hidden penalty.
+    scale = (q95 - q05).replace(0, np.nan).fillna(iqr).replace(0, 1.0)
+    outside = (q05 - e).clip(lower=0) + (e - q95).clip(lower=0)
+    marginal = (1 - (outside / scale).clip(upper=1).mean(axis=1)).fillna(0)
     joint = (1 / (1 + np.sqrt(((ez - ((m - med) / iqr).median()) ** 2).mean(axis=1)))).fillna(0)
     missing = e.isna().mean(axis=1)
     result = earth.copy()
     result["marginal_score"], result["joint_score"], result["missing_penalty"] = marginal, joint, missing
     result["spatial_coherence"] = 0.0
-    result["analog_score"] = (marginal / 3 + joint / 3) * (1 - missing)
+    result["analog_score"] = (marginal + joint) / 2 * (1 - missing)
     return result
 
 def _coherence(frame: pd.DataFrame) -> pd.Series:
@@ -46,6 +50,12 @@ def _coherence(frame: pd.DataFrame) -> pd.Series:
     return pd.Series(out, index=frame.index)
 
 def run(mars_path: Path, earth_path: Path, output: Path, process_id: str, features: list[str] | None = None) -> dict:
+    specs_path = Path(__file__).resolve().parents[1] / "configs" / "mars_process_specifications.json"
+    specs = {x["process_id"]: x for x in json.loads(specs_path.read_text(encoding="utf-8"))}
+    if process_id not in specs:
+        raise ValueError(f"Unknown process_id {process_id!r}; add a reviewed specification first")
+    if specs[process_id].get("status") != "supported_for_earth_screening":
+        raise ValueError(f"{process_id} is not supported for Earth screening; collect Mars evidence first")
     mars, earth = _read(mars_path), _read(earth_path)
     cols = _feature_columns(mars, earth, features); output.mkdir(parents=True, exist_ok=True)
     ranked = _scores(mars, earth, cols); ranked["spatial_coherence"] = _coherence(ranked)
