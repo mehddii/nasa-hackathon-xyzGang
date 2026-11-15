@@ -81,6 +81,25 @@ archive = OUT/'earth_measurement_files.zip'
 with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as bundle:
     for p in download_dir.iterdir():
         if p.is_file(): bundle.write(p, arcname=p.name)
+decoded_rows = []
+try:
+    import numpy as np, h5py
+    for row in downloads[downloads.downloaded].to_dict('records'):
+        path = Path(row['local_path'])
+        if path.suffix.lower() not in ('.h5', '.hdf5', '.nc', '.he5'): continue
+        with h5py.File(path, 'r') as handle:
+            def visit(name, obj):
+                if not hasattr(obj, 'shape') or not np.issubdtype(obj.dtype, np.number) or obj.size == 0: return
+                values = np.asarray(obj[...], dtype='float64').ravel()
+                values = values[np.isfinite(values)]
+                if values.size:
+                    decoded_rows.append({'product': row['product'], 'dataset': name, 'shape': str(obj.shape), 'count': int(values.size), 'mean': float(values.mean()), 'std': float(values.std()), 'min': float(values.min()), 'max': float(values.max())})
+            handle.visititems(visit)
+except Exception as exc:
+    decoded_rows.append({'product': '__decoder__', 'dataset': '__decode_error__', 'error': f'{type(exc).__name__}: {exc}'})
+decoded = pd.DataFrame(decoded_rows)
+decoded.to_csv(OUT/'decoded_numeric_features.csv', index=False)
+decoded.to_parquet(OUT/'decoded_numeric_features.parquet', index=False)
 summary = {
     'candidate_cells': int(len(matches)), 'products': collections,
     'earthdata_token_available': bool(token), 'secret_error': secret_error,
@@ -88,6 +107,7 @@ summary = {
     'download_attempts': int(len(downloads)),
     'downloaded_files': int(downloads.downloaded.sum()) if len(downloads) else 0,
     'archive': str(archive),
+    'decoded_numeric_rows': int(len(decoded)),
     'note': 'Downloaded files are raw product files; product-specific decoding and QA masking are required before process scores.'
 }
 (OUT/'manifest_summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
