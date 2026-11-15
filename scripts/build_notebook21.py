@@ -25,7 +25,7 @@ rules={
 }
 rows=[]
 for family,rule in rules.items():
-    part=decoded[decoded.product.isin(rule['products'])].copy()
+    part=decoded[decoded['product'].isin(rule['products'])].copy()
     if family=='terrain' and len(part) and not part.dataset_lower.str.contains('|'.join(rule['terms']),regex=True).any():
         selected=part.head(20).copy()
     else:
