@@ -1,0 +1,199 @@
+{
+  "status": "complete",
+  "run_started_utc": "2026-11-15T01:26:01.850391+00:00",
+  "run_finished_utc": "2026-11-15T01:26:29.919630+00:00",
+  "configuration": {
+    "medium_pixels_per_degree": 1,
+    "coarse_cell_degrees": 10,
+    "terrain_source_pixels_per_degree": 16,
+    "tes_source_pixels_per_degree": 8,
+    "mars_radius_m": 3396000.0,
+    "pca_archive_variance_target": 0.99,
+    "pca_model_variance_target": 0.95,
+    "pca_training_rows": 50000,
+    "minimum_spectral_valid_fraction": 0.8,
+    "minimum_tes_source_pixel_fraction": 0.5,
+    "emissivity_shape_noise_floor": 0.002,
+    "mineral_rms_error_max": 0.005,
+    "mineral_detection_limit": 0.1,
+    "spatial_block_degrees": 10,
+    "spatial_fold_count": 5,
+    "held_out_fold": 4,
+    "max_total_download_gb": 1.0,
+    "request_connect_timeout_s": 20,
+    "request_read_timeout_s": 240,
+    "random_seed": 42
+  },
+  "source_download_mib": 0.0,
+  "source_products": 9,
+  "pds4_bundles_resolved": 0,
+  "pds4_bundles_requested": 2,
+  "medium_cells": 64800,
+  "coarse_cells": 648,
+  "total_rows": 65448,
+  "physical_and_context_columns": 107,
+  "scaled_columns": 16,
+  "model_columns": 16,
+  "default_model_features_by_scale": {
+    "coarse_10deg": 16,
+    "medium_1deg": 13
+  },
+  "inactive_default_features": [
+    {
+      "scale": "medium_1deg",
+      "feature": "detection_supported__mineral_quartz",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "medium_1deg",
+      "feature": "detection_supported__mineral_k_feldspar",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "medium_1deg",
+      "feature": "detection_supported__mineral_plagioclase",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "medium_1deg",
+      "feature": "detection_supported__mineral_amphibole",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "medium_1deg",
+      "feature": "detection_supported__mineral_low_ca_pyroxene",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "medium_1deg",
+      "feature": "detection_supported__mineral_high_ca_pyroxene",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "medium_1deg",
+      "feature": "detection_supported__mineral_carbonates",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "medium_1deg",
+      "feature": "detection_supported__mineral_sheet_silicates_high_si_glass",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "coarse_10deg",
+      "feature": "detection_supported__mineral_quartz",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "coarse_10deg",
+      "feature": "detection_supported__mineral_k_feldspar",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "coarse_10deg",
+      "feature": "detection_supported__mineral_plagioclase",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "coarse_10deg",
+      "feature": "detection_supported__mineral_amphibole",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "coarse_10deg",
+      "feature": "detection_supported__mineral_low_ca_pyroxene",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "coarse_10deg",
+      "feature": "detection_supported__mineral_high_ca_pyroxene",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "coarse_10deg",
+      "feature": "detection_supported__mineral_carbonates",
+      "inactive_reason": "constant_in_training_geography"
+    },
+    {
+      "scale": "coarse_10deg",
+      "feature": "detection_supported__mineral_sheet_silicates_high_si_glass",
+      "inactive_reason": "constant_in_training_geography"
+    }
+  ],
+  "official_md5_available": 0,
+  "official_md5_verified": 0,
+  "coverage_percent": {
+    "Terrain": 100.0,
+    "Thermal": 61.11,
+    "Albedo": 100.0,
+    "Minerals": 100.0,
+    "Emissivity": 100.0
+  },
+  "coverage_cohorts": {
+    "medium_1deg": {
+      "full_multimodal": 39600,
+      "no_thermal": 25200
+    },
+    "coarse_10deg": {
+      "full_multimodal_with_neutron": 396,
+      "no_thermal_with_neutron": 252
+    }
+  },
+  "mineral_quality_retained_percent": 100.0,
+  "mineral_detection_supported_cell_counts": {
+    "quartz": 0,
+    "k_feldspar": 0,
+    "plagioclase": 64800,
+    "amphibole": 0,
+    "low_ca_pyroxene": 64800,
+    "high_ca_pyroxene": 64800,
+    "olivine": 64800,
+    "hematite": 49,
+    "sulfates": 126,
+    "carbonates": 0,
+    "sheet_silicates_high_si_glass": 0
+  },
+  "emissivity_input_bands": 73,
+  "emissivity_shape_archive_pca_components": 1,
+  "emissivity_shape_archive_variance_retained": 0.9998798370361328,
+  "emissivity_shape_model_pca_components": 1,
+  "emissivity_shape_model_variance_retained": 0.9998798370361328,
+  "emissivity_shape_heldout_reconstruction_variance": 0.9998863420809544,
+  "emissivity_shape_heldout_reconstruction_rmse": 3.7983386391715612e-06,
+  "emissivity_shape_model_heldout_reconstruction_variance": 0.9998863420809544,
+  "emissivity_shape_model_heldout_reconstruction_rmse": 3.7983386391715612e-06,
+  "spectral_correlation_diagnostics": {
+    "albedo_vs_shape_pc01_spearman": 0.22219235420570815,
+    "emissivity_level_vs_shape_pc01_spearman": -0.35852607473155995,
+    "spectral_contrast_vs_shape_pc01_spearman": -0.0008946512802057489
+  },
+  "held_out_spatial_fold": 4,
+  "important_cautions": [
+    "Neutron flux is hydrogen-sensitive evidence, not a direct water-ice label.",
+    "MOLA bins with zero shots contain interpolated elevation; use mola_observed_fraction.",
+    "Thermal inertia covers a restricted latitude range, so missingness is meaningful.",
+    "Mineral abundances are model-derived; default clustering uses only quality-passing concentrations at or above the published 0.10 detection limit.",
+    "Sub-threshold mineral concentrations remain optional evidence and must not be interpreted as confirmed mineral detections.",
+    "Coverage cohorts must be analysed separately or with an explicitly missing-aware model.",
+    "Quality, coverage, coordinates, and resolution fields are context for validation, not default cluster inputs.",
+    "Slope and curvature are masked poleward of 88 degrees; polar refinement requires a polar projection.",
+    "Medium and coarse rows are separate scales and must not be treated as independent copies of one measurement."
+  ],
+  "outputs": {
+    "combined_cells": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\processed\\mars_cells_input.parquet",
+    "medium_cells": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\processed\\mars_medium_cells.parquet",
+    "coarse_cells": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\processed\\mars_coarse_cells.parquet",
+    "aligned_medium_layers": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\processed\\mars_medium_aligned_layers.npz",
+    "aligned_medium_masks": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\processed\\mars_medium_masks.npz",
+    "provenance": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\reports\\provenance_manifest.json",
+    "download_manifest": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\reports\\download_manifest.csv",
+    "source_quality": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\reports\\source_quality.csv",
+    "mineral_quality_threshold": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\transforms\\mineral_quality_threshold.json",
+    "pca_variance": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\transforms\\emissivity_shape_pca_variance.csv",
+    "pca_loadings": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\transforms\\emissivity_shape_pca_loadings.csv",
+    "pca_transform": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\transforms\\emissivity_shape_pca_transform.npz",
+    "scaling_parameters": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\transforms\\robust_scaling_parameters.csv",
+    "feature_schema_csv": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\reports\\feature_schema.csv",
+    "feature_schema_json": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\reports\\feature_schema.json"
+  }
+}

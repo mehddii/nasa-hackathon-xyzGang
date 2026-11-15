@@ -1,0 +1,7 @@
+region_id,scale,analysis_cohort,centroid_latitude,centroid_longitude,neutral_type,anomaly_score,artifact_warning,best_candidate_label
+mars_medium_region_000110,medium_1deg,no_thermal,-74.92420212597337,-94.72073891325648,mars_medium_1deg__no_thermal_type_01,0.22558301305464235,False,
+mars_medium_region_000038,medium_1deg,full_multimodal,-10.428182532438097,-65.32495348896576,mars_medium_1deg__full_multimodal_type_01,0.1950495063450347,False,Dust-mantled or loose-material environment; aeolian susceptibility
+mars_medium_region_000119,medium_1deg,no_thermal,-75.5,85.0,mars_medium_1deg__no_thermal_type_01,0.19381151944406494,False,
+mars_coarse_region_000023,coarse_10deg,no_thermal_with_neutron,-85.0,180.0,mars_coarse_10deg__no_thermal_with_neutron_unresolved_noise,0.11452572033877595,False,
+mars_medium_region_000042,medium_1deg,full_multimodal,9.860049173286383,70.0223028758965,mars_medium_1deg__full_multimodal_type_00,0.0852037709546889,False,
+mars_coarse_region_000003,coarse_10deg,full_multimodal_with_neutron,55.0,-175.0,mars_coarse_10deg__full_multimodal_with_neutron_type_00,0.058432242851641725,False,

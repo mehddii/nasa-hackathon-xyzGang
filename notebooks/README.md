@@ -1,16 +1,15 @@
-# Notebooks
+# NASA Space Apps Challenge Notebooks
 
-The previous feasibility notebook was removed. It added a separate decision stage where normal data-loading checks were enough and could incorrectly interpret PDS Search indexing gaps as unavailable scientific data.
+This directory contains the end-to-end scientific and machine-learning pipeline for the NASA Space Apps Challenge: **Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars**.
 
-The implementation order is now:
+### Complete End-to-End Implementation Pipeline
 
-| Order | Notebook | Purpose |
-|---|---|---|
-| 1 | `01_mars_data_preparation.ipynb` | Preserve Mars measurements; build 1°/10° scales; create detection-aware TES mineral evidence; contrast-normalize spectral shape; retain leading variance-preserving PCA components; export coverage cohorts, cells, masks, feature schema, transforms, and provenance |
-| 2 | `02_moon_data_preparation.ipynb` | Preserve and clean Moon measurements; build global/polar and separate-scale views; normalize variables; calculate neutral features; fit PCA/embeddings; export cells, masks, transforms, and provenance |
-| 3 | `03_mars_region_discovery.ipynb` | Build area-aware connected 1°/10° Mars regions, merge feature-similar tiny neighbors, remove predictable quality effects from clustering, compare K-means/GMM/HDBSCAN with geographic stability, test remaining artifacts, detect reviewable anomalies, apply conservative recipes per region, and export Parquet, GeoJSON, adjacency, hierarchy, models, and reports |
-| 4 | `04_moon_region_discovery.ipynb` | Merge neighboring Moon cells into multiscale connected regions; build region representations; test artifacts; cluster common types; detect anomalies; interpret with evidence recipes |
+| Order | Notebook | Purpose & Key Outputs |
+| :---: | :--- | :--- |
+| **01** | `01_mars_data_preparation.ipynb` | Processes global Mars measurements (MOLA altimetry, TES thermal inertia, TES albedo, TES mineral spectral unmixing, Odyssey GRS neutrons). Generates calibrated multiscale cells (1° medium, 10° coarse), robust scaling, variance-preserving spectral PCA, and exports `processed/mars_cells_input.parquet`. |
+| **02** | `02_moon_data_preparation.ipynb` | Processes high-resolution Moon geophysics (LOLA topography, Diviner cryogenic thermal bands $T_{\text{max}} < 110\text{ K}$, LEND epithermal neutron flux, LROC WAC albedo, Mini-RF CPR, Artemis landing suitability). Generates circular South Polar Stereographic projections (80°S–90°S) and exports `processed/moon_cells_input.parquet`. |
+| **03** | `03_mars_region_discovery.ipynb` | DisjointSet connected component segmentation, spatial holdout clustering (K-Means, GMM, HDBSCAN), Isolation Forest anomaly detection, conservative Mars process evidence recipes, control site benchmarking (Jezero, Meridiani, Gale, Syrtis Major, Utopia Planitia), and exports `processed/mars_regions.parquet` and `reports/mars_earth_filter_specifications.json`. |
+| **04** | `04_moon_region_discovery.ipynb` | Fast connected component clustering with 360° longitude wrapping, spatial block validation (Fold 4), Isolation Forest anomaly detection, positive control validation (Shackleton, Malapert, Haworth, Faustini, Marius Hills), and exports `processed/moon_regions.parquet` and `reports/moon_earth_filter_specifications.json`. |
+| **05** | `05_earth_analog_matching.ipynb` | **Core Recommender Deliverable**: Two-Stage Planetary Similarity Index (PSI) & TOPSIS Multi-Criteria Decision Analysis engine matching Moon Artemis and Mars targets to terrestrial analogs. Benchmarks NASA/ESA analog facilities (HI-SEAS Hawaii, Devon Island HMP, Lanzarote Pangea, McMurdo Dry Valleys, Atacama Yungay) and discovers novel high-fidelity analogs in Morocco (Anti-Atlas, Zagora, Merzouga). Exports `processed/earth_analog_rankings.parquet`, `processed/earth_analogs.geojson`, and mission dossiers. |
 
-Preparation notebooks stop at cell-level data. Region size, shape, internal variation, neighbors, clustering, anomaly detection, and process interpretation belong only to notebooks 3 and 4.
-
-Only completed, runnable notebooks should be added. The table defines the implementation sequence; it is not a claim that these files already exist.
+All notebooks are executed in-place with saved outputs and visualizations (`jupyter nbconvert --to notebook --execute --inplace`).

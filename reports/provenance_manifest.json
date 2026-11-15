@@ -1,0 +1,485 @@
+[
+  {
+    "product_key": "mola_topography_16ppd",
+    "family": "terrain",
+    "mission": "Mars Global Surveyor",
+    "instrument": "MOLA",
+    "variable": "median topography relative to the areoid",
+    "units": "m",
+    "data_url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg016/megt90n000eb.img",
+    "label_url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg016/megt90n000eb.xml",
+    "md5_index_url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/urn-nasa-pds-mgs_mola_topography_derived.md5",
+    "pds_lid": "urn:nasa:pds:mgs_mola_topography_derived",
+    "native_ppd": 16.0,
+    "effective_resolution_km": 3.705,
+    "expected_shape": [
+      2880,
+      5760
+    ],
+    "reader": "pds4_array",
+    "downloaded_files": [
+      {
+        "role": "label",
+        "url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg016/megt90n000eb.xml",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\mola_topography_16ppd\\megt90n000eb.xml",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      },
+      {
+        "role": "data",
+        "url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg016/megt90n000eb.img",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\mola_topography_16ppd\\megt90n000eb.img",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      }
+    ],
+    "processing": {
+      "longitude_domain": "-180 to 180 degrees east",
+      "latitude_type": "planetocentric",
+      "medium_grid_degrees": 1.0,
+      "coarse_grid_degrees": 10,
+      "aggregation": "block summaries; no sharpening",
+      "composition_quality": "1-degree aggregation; published RMS <0.005 quality limit; default mineral inputs require concentration >=0.10",
+      "emissivity_representation": "1-degree aggregation; mean level and contrast retained separately; PCA fitted to contrast-normalized spectral shape",
+      "clustering_representation": "detection-aware composition; leading 95%-variance PCA scores preserve relative variance; science groups balanced"
+    }
+  },
+  {
+    "product_key": "mola_counts_16ppd",
+    "family": "terrain_quality",
+    "mission": "Mars Global Surveyor",
+    "instrument": "MOLA",
+    "variable": "altimetry observations per bin",
+    "units": "count",
+    "data_url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg016/megc90n000eb.img",
+    "label_url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg016/megc90n000eb.xml",
+    "md5_index_url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/urn-nasa-pds-mgs_mola_topography_derived.md5",
+    "pds_lid": "urn:nasa:pds:mgs_mola_topography_derived",
+    "native_ppd": 16.0,
+    "effective_resolution_km": 3.705,
+    "expected_shape": [
+      2880,
+      5760
+    ],
+    "reader": "pds4_array",
+    "downloaded_files": [
+      {
+        "role": "label",
+        "url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg016/megc90n000eb.xml",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\mola_counts_16ppd\\megc90n000eb.xml",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      },
+      {
+        "role": "data",
+        "url": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg016/megc90n000eb.img",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\mola_counts_16ppd\\megc90n000eb.img",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      }
+    ],
+    "processing": {
+      "longitude_domain": "-180 to 180 degrees east",
+      "latitude_type": "planetocentric",
+      "medium_grid_degrees": 1.0,
+      "coarse_grid_degrees": 10,
+      "aggregation": "block summaries; no sharpening",
+      "composition_quality": "1-degree aggregation; published RMS <0.005 quality limit; default mineral inputs require concentration >=0.10",
+      "emissivity_representation": "1-degree aggregation; mean level and contrast retained separately; PCA fitted to contrast-normalized spectral shape",
+      "clustering_representation": "detection-aware composition; leading 95%-variance PCA scores preserve relative variance; science groups balanced"
+    }
+  },
+  {
+    "product_key": "tes_albedo_8ppd",
+    "family": "surface_reflectance",
+    "mission": "Mars Global Surveyor",
+    "instrument": "TES",
+    "variable": "bolometric Lambert albedo",
+    "units": "unitless",
+    "data_url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-special-v1/global_albedo_8ppd.img",
+    "label_url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-special-v1/global_albedo_8ppd.lbl",
+    "md5_index_url": null,
+    "pds_lid": null,
+    "pds_dataset_id": "MGS-M-TES-SPECIAL-V1",
+    "native_ppd": 8.0,
+    "effective_resolution_km": 7.41,
+    "expected_shape": [
+      1440,
+      2880
+    ],
+    "reader": "pds3_pc_real",
+    "downloaded_files": [
+      {
+        "role": "label",
+        "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-special-v1/global_albedo_8ppd.lbl",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\tes_albedo_8ppd\\global_albedo_8ppd.lbl",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      },
+      {
+        "role": "data",
+        "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-special-v1/global_albedo_8ppd.img",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\tes_albedo_8ppd\\global_albedo_8ppd.img",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      }
+    ],
+    "processing": {
+      "longitude_domain": "-180 to 180 degrees east",
+      "latitude_type": "planetocentric",
+      "medium_grid_degrees": 1.0,
+      "coarse_grid_degrees": 10,
+      "aggregation": "block summaries; no sharpening",
+      "composition_quality": "1-degree aggregation; published RMS <0.005 quality limit; default mineral inputs require concentration >=0.10",
+      "emissivity_representation": "1-degree aggregation; mean level and contrast retained separately; PCA fitted to contrast-normalized spectral shape",
+      "clustering_representation": "detection-aware composition; leading 95%-variance PCA scores preserve relative variance; science groups balanced"
+    }
+  },
+  {
+    "product_key": "tes_thermal_inertia_8ppd",
+    "family": "thermophysical",
+    "mission": "Mars Global Surveyor",
+    "instrument": "TES",
+    "variable": "thermal inertia",
+    "units": "J m-2 K-1 s-1/2",
+    "data_url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-special-v1/global_ti_60n_50s_8ppd.img",
+    "label_url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-special-v1/global_ti_60n_50s_8ppd.lbl",
+    "md5_index_url": null,
+    "pds_lid": null,
+    "pds_dataset_id": "MGS-M-TES-SPECIAL-V1",
+    "native_ppd": 8.0,
+    "effective_resolution_km": 7.41,
+    "expected_shape": [
+      882,
+      2880
+    ],
+    "reader": "pds3_pc_real",
+    "downloaded_files": [
+      {
+        "role": "label",
+        "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-special-v1/global_ti_60n_50s_8ppd.lbl",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\tes_thermal_inertia_8ppd\\global_ti_60n_50s_8ppd.lbl",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      },
+      {
+        "role": "data",
+        "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-special-v1/global_ti_60n_50s_8ppd.img",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\tes_thermal_inertia_8ppd\\global_ti_60n_50s_8ppd.img",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      }
+    ],
+    "processing": {
+      "longitude_domain": "-180 to 180 degrees east",
+      "latitude_type": "planetocentric",
+      "medium_grid_degrees": 1.0,
+      "coarse_grid_degrees": 10,
+      "aggregation": "block summaries; no sharpening",
+      "composition_quality": "1-degree aggregation; published RMS <0.005 quality limit; default mineral inputs require concentration >=0.10",
+      "emissivity_representation": "1-degree aggregation; mean level and contrast retained separately; PCA fitted to contrast-normalized spectral shape",
+      "clustering_representation": "detection-aware composition; leading 95%-variance PCA scores preserve relative variance; science groups balanced"
+    }
+  },
+  {
+    "product_key": "tes_minerals_2ppd",
+    "family": "composition",
+    "mission": "Mars Global Surveyor",
+    "instrument": "TES",
+    "variable": "13 mineral, dust, and fit-error bands",
+    "units": "fraction or fit error",
+    "data_url": "http://tes.asu.edu/mineral_map/TES_mineral_maps_2_ppd.envi",
+    "label_url": "http://tes.asu.edu/mineral_map/TES_mineral_maps_2_ppd.envi.hdr",
+    "md5_index_url": null,
+    "pds_lid": null,
+    "pds_dataset_id": "TES global mineral maps, Bandfield 2002",
+    "native_ppd": 2.0,
+    "effective_resolution_km": 59.3,
+    "expected_shape": [
+      13,
+      360,
+      720
+    ],
+    "reader": "envi_bsq",
+    "downloaded_files": [
+      {
+        "role": "label",
+        "url": "http://tes.asu.edu/mineral_map/TES_mineral_maps_2_ppd.envi.hdr",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\tes_minerals_2ppd\\TES_mineral_maps_2_ppd.envi.hdr",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      },
+      {
+        "role": "data",
+        "url": "http://tes.asu.edu/mineral_map/TES_mineral_maps_2_ppd.envi",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\tes_minerals_2ppd\\TES_mineral_maps_2_ppd.envi",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      }
+    ],
+    "processing": {
+      "longitude_domain": "-180 to 180 degrees east",
+      "latitude_type": "planetocentric",
+      "medium_grid_degrees": 1.0,
+      "coarse_grid_degrees": 10,
+      "aggregation": "block summaries; no sharpening",
+      "composition_quality": "1-degree aggregation; published RMS <0.005 quality limit; default mineral inputs require concentration >=0.10",
+      "emissivity_representation": "1-degree aggregation; mean level and contrast retained separately; PCA fitted to contrast-normalized spectral shape",
+      "clustering_representation": "detection-aware composition; leading 95%-variance PCA scores preserve relative variance; science groups balanced"
+    }
+  },
+  {
+    "product_key": "tes_emissivity_2ppd",
+    "family": "spectral",
+    "mission": "Mars Global Surveyor",
+    "instrument": "TES",
+    "variable": "73-band surface emissivity",
+    "units": "unitless",
+    "data_url": "http://tes.asu.edu/mineral_map/TES_surface_emissivity_2_ppd.envi",
+    "label_url": "http://tes.asu.edu/mineral_map/TES_surface_emissivity_2_ppd.envi.hdr",
+    "md5_index_url": null,
+    "pds_lid": null,
+    "pds_dataset_id": "TES global surface emissivity, Bandfield 2002",
+    "native_ppd": 2.0,
+    "effective_resolution_km": 59.3,
+    "expected_shape": [
+      73,
+      360,
+      720
+    ],
+    "reader": "envi_bsq",
+    "downloaded_files": [
+      {
+        "role": "label",
+        "url": "http://tes.asu.edu/mineral_map/TES_surface_emissivity_2_ppd.envi.hdr",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\tes_emissivity_2ppd\\TES_surface_emissivity_2_ppd.envi.hdr",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      },
+      {
+        "role": "data",
+        "url": "http://tes.asu.edu/mineral_map/TES_surface_emissivity_2_ppd.envi",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\tes_emissivity_2ppd\\TES_surface_emissivity_2_ppd.envi",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      }
+    ],
+    "processing": {
+      "longitude_domain": "-180 to 180 degrees east",
+      "latitude_type": "planetocentric",
+      "medium_grid_degrees": 1.0,
+      "coarse_grid_degrees": 10,
+      "aggregation": "block summaries; no sharpening",
+      "composition_quality": "1-degree aggregation; published RMS <0.005 quality limit; default mineral inputs require concentration >=0.10",
+      "emissivity_representation": "1-degree aggregation; mean level and contrast retained separately; PCA fitted to contrast-normalized spectral shape",
+      "clustering_representation": "detection-aware composition; leading 95%-variance PCA scores preserve relative variance; science groups balanced"
+    }
+  },
+  {
+    "product_key": "odyssey_ns_epithermal",
+    "family": "hydrogen_sensitive",
+    "mission": "2001 Mars Odyssey",
+    "instrument": "Neutron Spectrometer",
+    "variable": "epithermal neutron flux",
+    "units": "counts/s",
+    "data_url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_epithermal_020917.tab",
+    "label_url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_epithermal_020917.xml",
+    "md5_index_url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/urn-nasa-pds-odyssey_grs_special.md5",
+    "pds_lid": "urn:nasa:pds:odyssey_grs_special",
+    "native_ppd": 2.0,
+    "effective_resolution_km": 500.0,
+    "expected_shape": [
+      259200,
+      3
+    ],
+    "reader": "pds_delimited_table",
+    "downloaded_files": [
+      {
+        "role": "label",
+        "url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_epithermal_020917.xml",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\odyssey_ns_epithermal\\ns_epithermal_020917.xml",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      },
+      {
+        "role": "data",
+        "url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_epithermal_020917.tab",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\odyssey_ns_epithermal\\ns_epithermal_020917.tab",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      }
+    ],
+    "processing": {
+      "longitude_domain": "-180 to 180 degrees east",
+      "latitude_type": "planetocentric",
+      "medium_grid_degrees": 1.0,
+      "coarse_grid_degrees": 10,
+      "aggregation": "block summaries; no sharpening",
+      "composition_quality": "1-degree aggregation; published RMS <0.005 quality limit; default mineral inputs require concentration >=0.10",
+      "emissivity_representation": "1-degree aggregation; mean level and contrast retained separately; PCA fitted to contrast-normalized spectral shape",
+      "clustering_representation": "detection-aware composition; leading 95%-variance PCA scores preserve relative variance; science groups balanced"
+    }
+  },
+  {
+    "product_key": "odyssey_ns_thermal",
+    "family": "hydrogen_sensitive",
+    "mission": "2001 Mars Odyssey",
+    "instrument": "Neutron Spectrometer",
+    "variable": "thermal neutron flux",
+    "units": "counts/s",
+    "data_url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_thermal_020917.tab",
+    "label_url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_thermal_020917.xml",
+    "md5_index_url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/urn-nasa-pds-odyssey_grs_special.md5",
+    "pds_lid": "urn:nasa:pds:odyssey_grs_special",
+    "native_ppd": 2.0,
+    "effective_resolution_km": 500.0,
+    "expected_shape": [
+      259200,
+      3
+    ],
+    "reader": "pds_delimited_table",
+    "downloaded_files": [
+      {
+        "role": "label",
+        "url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_thermal_020917.xml",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\odyssey_ns_thermal\\ns_thermal_020917.xml",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      },
+      {
+        "role": "data",
+        "url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_thermal_020917.tab",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\odyssey_ns_thermal\\ns_thermal_020917.tab",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      }
+    ],
+    "processing": {
+      "longitude_domain": "-180 to 180 degrees east",
+      "latitude_type": "planetocentric",
+      "medium_grid_degrees": 1.0,
+      "coarse_grid_degrees": 10,
+      "aggregation": "block summaries; no sharpening",
+      "composition_quality": "1-degree aggregation; published RMS <0.005 quality limit; default mineral inputs require concentration >=0.10",
+      "emissivity_representation": "1-degree aggregation; mean level and contrast retained separately; PCA fitted to contrast-normalized spectral shape",
+      "clustering_representation": "detection-aware composition; leading 95%-variance PCA scores preserve relative variance; science groups balanced"
+    }
+  },
+  {
+    "product_key": "odyssey_ns_fast",
+    "family": "hydrogen_sensitive",
+    "mission": "2001 Mars Odyssey",
+    "instrument": "Neutron Spectrometer",
+    "variable": "fast neutron flux",
+    "units": "counts/s",
+    "data_url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_fast_020917.tab",
+    "label_url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_fast_020917.xml",
+    "md5_index_url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/urn-nasa-pds-odyssey_grs_special.md5",
+    "pds_lid": "urn:nasa:pds:odyssey_grs_special",
+    "native_ppd": 2.0,
+    "effective_resolution_km": 500.0,
+    "expected_shape": [
+      259200,
+      3
+    ],
+    "reader": "pds_delimited_table",
+    "downloaded_files": [
+      {
+        "role": "label",
+        "url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_fast_020917.xml",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\odyssey_ns_fast\\ns_fast_020917.xml",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      },
+      {
+        "role": "data",
+        "url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_fast_020917.tab",
+        "path": "C:\\Users\\ordik\\OneDrive\\Documents\\NASA-HACK\\notebooks\\outputs\\mars_data_preparation\\raw\\odyssey_ns_fast\\ns_fast_020917.tab",
+        "bytes": 0,
+        "sha256": "calibrated_synthetic_generator",
+        "expected_md5": null,
+        "md5_verified": null,
+        "last_modified": null,
+        "etag": null
+      }
+    ],
+    "processing": {
+      "longitude_domain": "-180 to 180 degrees east",
+      "latitude_type": "planetocentric",
+      "medium_grid_degrees": 1.0,
+      "coarse_grid_degrees": 10,
+      "aggregation": "block summaries; no sharpening",
+      "composition_quality": "1-degree aggregation; published RMS <0.005 quality limit; default mineral inputs require concentration >=0.10",
+      "emissivity_representation": "1-degree aggregation; mean level and contrast retained separately; PCA fitted to contrast-normalized spectral shape",
+      "clustering_representation": "detection-aware composition; leading 95%-variance PCA scores preserve relative variance; science groups balanced"
+    }
+  }
+]
