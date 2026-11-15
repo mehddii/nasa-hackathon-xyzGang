@@ -18,6 +18,12 @@ paths=all_hits('downloaded_measurements.parquet')
 if not paths:
     raise FileNotFoundError('Attach notebook 19 output containing downloaded_measurements.parquet')
 manifest=pd.read_parquet(paths[0])
+archives=all_hits('earth_measurement_files.zip')
+if archives:
+    extract_root=Path('/kaggle/working/earth_measurement_files')
+    extract_root.mkdir(exist_ok=True)
+    with zipfile.ZipFile(archives[0]) as bundle: bundle.extractall(extract_root)
+    ROOTS.append(extract_root)
 rows=[]
 for row in manifest.to_dict('records'):
     if not bool(row.get('downloaded')): continue
@@ -40,12 +46,17 @@ for row in manifest.to_dict('records'):
     except Exception as exc:
         rows.append({**row,'attached_path':str(path),'dataset':'__decode_error__','count':0,'error':f'{type(exc).__name__}: {exc}'})
 features=pd.DataFrame(rows)
+if features.empty:
+    features=pd.DataFrame(columns=['product','dataset','count','mean','std','min','max'])
 out=Path('/kaggle/working/earth_decoded_features'); out.mkdir(exist_ok=True)
 features.to_parquet(out/'earth_decoded_numeric_features.parquet',index=False)
 features.to_csv(out/'earth_decoded_numeric_features.csv',index=False)
 summary={'input_files':int(len(manifest)),'decoded_rows':int(len(features)),'products':sorted(features.product.dropna().unique().tolist()) if len(features) else [],'warning':'Numeric summaries are not final process features; product-specific QA, scale factors, and spatial extraction remain required.'}
 (out/'decode_summary.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
-display(features.groupby('product').size().rename('decoded_rows'))
+if 'product' in features.columns and len(features):
+    display(features.groupby('product').size().rename('decoded_rows'))
+else:
+    print('No downloaded binary files were attached; notebook 19 archive is required.')
 print(json.dumps(summary,indent=2))
 '''
 

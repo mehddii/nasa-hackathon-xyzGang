@@ -6,7 +6,7 @@ intro = '''# 19 — Direct Earth measurements for process matching
 This notebook searches the top Earth candidates and downloads a bounded sample of actual measurement files. It does not pretend that precipitation or temperature are mineral or ice measurements. The files are preserved with checksums for product-specific decoding in the next step.
 '''
 code = '''from pathlib import Path
-import hashlib, json, os, requests, pandas as pd
+import hashlib, json, os, zipfile, requests, pandas as pd
 from IPython.display import display
 
 ROOTS = [Path('/kaggle/working'), Path('/kaggle/input')]
@@ -77,12 +77,17 @@ for product, group in manifest.dropna(subset=['download_url']).groupby('product'
 downloads = pd.DataFrame(download_rows)
 downloads.to_csv(OUT/'downloaded_measurements.csv', index=False)
 downloads.to_parquet(OUT/'downloaded_measurements.parquet', index=False)
+archive = OUT/'earth_measurement_files.zip'
+with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as bundle:
+    for p in download_dir.iterdir():
+        if p.is_file(): bundle.write(p, arcname=p.name)
 summary = {
     'candidate_cells': int(len(matches)), 'products': collections,
     'earthdata_token_available': bool(token), 'secret_error': secret_error,
     'granules_found': int(manifest.granule_id.notna().sum()),
     'download_attempts': int(len(downloads)),
     'downloaded_files': int(downloads.downloaded.sum()) if len(downloads) else 0,
+    'archive': str(archive),
     'note': 'Downloaded files are raw product files; product-specific decoding and QA masking are required before process scores.'
 }
 (OUT/'manifest_summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
